@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class GameActivity extends AppCompatActivity {
-
     boolean isGameOver = false;
     TextView stepsCounterTextView;
     TextView timerTextView;
@@ -30,7 +29,7 @@ public class GameActivity extends AppCompatActivity {
     long startTime;
     int[][] permutation = new int[4][];
     enum Directions {
-        UP, DOWN, LEFT, RIGHT, NONE;
+        UP, DOWN, LEFT, RIGHT, NONE
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +131,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void SwapStates(int row, int col, Directions direction) {
-        int targetRow = row, targerCol = col;
+        int targetRow = row, targetCol = col;
         switch (direction) {
             case UP:
                 --targetRow;
@@ -141,20 +140,20 @@ public class GameActivity extends AppCompatActivity {
                 ++targetRow;
                 break;
             case LEFT:
-                --targerCol;
+                --targetCol;
                 break;
             case RIGHT:
-                ++targerCol;
+                ++targetCol;
         }
 
         buttons[4 * row + col].setVisibility(View.INVISIBLE);
-        buttons[4 * targetRow + targerCol].setVisibility(View.VISIBLE);
+        buttons[4 * targetRow + targetCol].setVisibility(View.VISIBLE);
 
         int tmp = permutation[row][col];
-        permutation[row][col] = permutation[targetRow][targerCol];
-        permutation[targetRow][targerCol] = tmp;
+        permutation[row][col] = permutation[targetRow][targetCol];
+        permutation[targetRow][targetCol] = tmp;
 
-        buttons[4 * targetRow + targerCol].setImageBitmap((Bitmap.createBitmap(background, (tmp % 4) * size / 4, (tmp / 4) * size / 4, size / 4, size / 4)));
+        buttons[4 * targetRow + targetCol].setImageBitmap((Bitmap.createBitmap(background, (tmp % 4) * size / 4, (tmp / 4) * size / 4, size / 4, size / 4)));
     }
 
     public int CountInversions(ArrayList<Integer> arrayList) {
@@ -176,20 +175,20 @@ public class GameActivity extends AppCompatActivity {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                while (!isGameOver) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            long currentTime = (System.currentTimeMillis() - startTime) / 10;
+                try {
+                    while (!isGameOver) {
+                        final long currentTime = (System.currentTimeMillis() - startTime) / 10;
+                        timerTextView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                timerTextView.setText(String.format("%d:%02d:%02d", currentTime / 6000, (currentTime / 100) % 60, currentTime % 100));
+                            }
+                        });
 
-                            timerTextView.setText(String.format("%d:%02d:%02d", currentTime / 6000, (currentTime / 100) % 60, currentTime % 100));
-                        }
-                    });
-                    try {
-                        Thread.sleep(25);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                        Thread.sleep(16);
                     }
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
                 }
             }
         };
