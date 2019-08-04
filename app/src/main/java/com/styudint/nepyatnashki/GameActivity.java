@@ -2,21 +2,21 @@ package com.styudint.nepyatnashki;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+import com.styudint.nepyatnashki.data.GameInfo;
+import com.styudint.nepyatnashki.data.StatisticsRepository;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+
+import javax.inject.Inject;
 
 public class GameActivity extends AppCompatActivity {
     boolean isGameOver = false;
@@ -31,10 +31,19 @@ public class GameActivity extends AppCompatActivity {
     enum Directions {
         UP, DOWN, LEFT, RIGHT, NONE
     }
+
+    @Inject
+    StatisticsRepository statsRepo;
+    long timestamp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        timestamp = System.currentTimeMillis();
+
+        ((NePyatnashkiApp) getApplication()).getAppComponent().inject(this);
 
         ArrayList<Integer> randPerm = new ArrayList<>();
         for (int i = 0; i < 16; i++)
@@ -124,6 +133,9 @@ public class GameActivity extends AppCompatActivity {
             }
             if (isSolved) {
                 isGameOver = true;
+                long endTime = System.currentTimeMillis();
+                long time = (endTime - startTime) / 10;
+                statsRepo.saveGame(new GameInfo(startTime, time, true));
                 Toast toast = Toast.makeText(getApplicationContext(), "Legendary!", Toast.LENGTH_LONG);
                 toast.show();
             }
@@ -171,25 +183,35 @@ public class GameActivity extends AppCompatActivity {
         return result;
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!isGameOver) {
+            long endTime = System.currentTimeMillis();
+            long time = (endTime - startTime) / 10;
+            statsRepo.saveGame(new GameInfo(startTime, time, false));
+        }
+        finish();
+    }
+
     public void startStopWatch() {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                try {
-                    while (!isGameOver) {
-                        final long currentTime = (System.currentTimeMillis() - startTime) / 10;
-                        timerTextView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                timerTextView.setText(String.format("%d:%02d:%02d", currentTime / 6000, (currentTime / 100) % 60, currentTime % 100));
-                            }
-                        });
+            try {
+                while (!isGameOver) {
+                    final long currentTime = (System.currentTimeMillis() - startTime) / 10;
+                    timerTextView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                        timerTextView.setText(String.format("%d:%02d:%02d", currentTime / 6000, (currentTime / 100) % 60, currentTime % 100));
+                        }
+                    });
 
-                        Thread.sleep(16);
-                    }
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    Thread.sleep(16);
                 }
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
             }
         };
 
