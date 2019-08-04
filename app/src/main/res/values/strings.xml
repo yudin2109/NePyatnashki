@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">NePyatnashki</string>
+    <string name="watch_your_stats_string">Watch your stats</string>
+    <string name="statistics_string">Statistics</string>
 </resources>
