@@ -4,9 +4,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.lifecycle.Observer;
 
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -18,27 +21,24 @@ import com.styudint.nepyatnashki.data.GameState;
 import com.styudint.nepyatnashki.data.GameStateListener;
 import com.styudint.nepyatnashki.data.repositories.StatisticsRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import javax.inject.Inject;
 
 public class GameActivity extends AppCompatActivity implements GameStateListener {
-    boolean isGameOver = false;
+    static float swipeThreshold = 120f;
+
     TextView stepsCounterTextView;
     TextView timerTextView;
     ImageButton[] buttons;
     Bitmap background;
     int size;
-    long startTime;
+
+    GestureDetectorCompat gestureDetector;
 
     @Inject
     StatisticsRepository statsRepo;
 
     @Inject
     GameStartStateGenerator generator;
-
-    long timestamp;
 
     GameState currentGameState;
 
@@ -48,6 +48,8 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
         setContentView(R.layout.activity_main);
 
         ((NePyatnashkiApp) getApplication()).getAppComponent().inject(this);
+
+        gestureDetector = new GestureDetectorCompat(this, new GestureListener());
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.test_misha);
         background = Bitmap.createScaledBitmap(background, background.getWidth(), background.getHeight(), false);
@@ -84,22 +86,38 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
     }
 
     private void startGame(GameState gameState) {
-        startTime = System.currentTimeMillis();
-        timestamp = System.currentTimeMillis();
-
+        gameState.start();
         gameState.subscribe(this);
+        gameState.moves().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                stepsCounterTextView.setText(integer.toString());
+            }
+        });
+        gameState.stopWatch().observe(this, new Observer<Long>() {
+            @Override
+            public void onChanged(Long timeValue) {
+                timerTextView.setText(formatTime(timeValue));
+            }
+        });
 
         applyGameState(gameState);
+    }
 
-        startStopWatch();
+    private String formatTime(long time) {
+        time /= 10;
+        return String.format("%d:%02d:%02d", time / 6000, (time / 100) % 60, time % 100);
     }
 
     private void applyGameState(GameState gameState) {
         for (int i = 0; i < 16; i++) {
             int id = gameState.permutation().get(i);
             buttons[i].setImageBitmap(Bitmap.createBitmap(background, (id % 4) * size / 4, (id / 4) * size / 4, size / 4, size / 4));
-            if (id == 15)
+            if (id == 15) {
                 buttons[i].setVisibility(View.INVISIBLE);
+            } else {
+                buttons[i].setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -111,10 +129,7 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
     @Override
     public void solved() {
         Toast.makeText(getApplicationContext(), "Legendary!", Toast.LENGTH_LONG).show();
-        long endTime = System.currentTimeMillis();
-        long time = (endTime - startTime) / 10;
-        statsRepo.saveGame(new GameInfo(startTime, time, true));
-        isGameOver = true;
+        statsRepo.saveGame(new GameInfo(currentGameState.startTime(), currentGameState.gameTime(), true));
     }
 
     public void onClick(View view) {
@@ -125,37 +140,44 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
 
     @Override
     public void onBackPressed() {
-        if (!isGameOver) {
-            long endTime = System.currentTimeMillis();
-            long time = (endTime - startTime) / 10;
-            statsRepo.saveGame(new GameInfo(startTime, time, false));
+        currentGameState.stop();
+        if (!currentGameState.isSolved()) {
+            statsRepo.saveGame(new GameInfo(currentGameState.startTime(), currentGameState.gameTime(), false));
         }
         finish();
     }
 
-    public void startStopWatch() {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (!isGameOver) {
-                        final long currentTime = (System.currentTimeMillis() - startTime) / 10;
-                        timerTextView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                            timerTextView.setText(String.format("%d:%02d:%02d", currentTime / 6000, (currentTime / 100) % 60, currentTime % 100));
-                            }
-                        });
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        gestureDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
 
-                        Thread.sleep(16);
+    class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            float dX = e2.getX() - e1.getX();
+            float dY = e2.getY() - e1.getY();
+
+            if (Math.abs(dX) > Math.abs(dY)) {
+                if (Math.abs(dX) > swipeThreshold) {
+                    if (dX < 0) {
+                        currentGameState.moveLeft();
+                    } else {
+                        currentGameState.moveRight();
                     }
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                }
+            } else {
+                if (Math.abs(dY) > swipeThreshold) {
+                    if (dY < 0) {
+                        currentGameState.moveUp();
+                    } else {
+                        currentGameState.moveDown();
+                    }
                 }
             }
-        };
 
-        Thread thread = new Thread(runnable);
-        thread.start();
+            return super.onFling(e1, e2, velocityX, velocityY);
+        }
     }
 }

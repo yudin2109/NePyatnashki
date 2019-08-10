@@ -16,7 +16,13 @@ interface GameState {
     fun stopWatch(): LiveData<Long>
     fun moves(): LiveData<Int>
 
+    fun isSolved(): Boolean
+
+    fun startTime(): Long
+    fun gameTime(): Long
+
     fun start()
+    fun stop()
 
     fun subscribe(listener: GameStateListener)
     fun unsubscribe(listener: GameStateListener)

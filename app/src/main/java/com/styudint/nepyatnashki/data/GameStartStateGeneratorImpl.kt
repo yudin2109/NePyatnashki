@@ -3,20 +3,28 @@ package com.styudint.nepyatnashki.data
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
-import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class GameStartStateGeneratorImpl : GameStartStateGenerator {
+class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerator {
     companion object {
         const val SIZE = 16
+        const val DEFAULT_DELAY_TIME = 16L
     }
 
     private class GameStateImpl(private var permutation: ArrayList<Int>) : GameState {
         private val listeners = ArrayList<GameStateListener>()
         private val moves = MutableLiveData<Int>()
         private val stopWatch = MutableLiveData<Long>()
+
+        private var amountOfMoves = 0
+        private var isGameOver = false
+        private var startTime: Long = 0
+        private var endTime: Long = 0
+        private var gameTime: Long = 0
 
         override fun moveUp() {
             move(-1, 0)
@@ -39,7 +47,7 @@ class GameStartStateGeneratorImpl : GameStartStateGenerator {
             val emptyPosition = findEmpty()
             val diff = Math.abs(position.first - emptyPosition.first) + Math.abs(position.second - emptyPosition.second)
             if (diff == 1) {
-                move(position.first - emptyPosition.first, position.second - emptyPosition.second)
+                move(emptyPosition.first - position.first, emptyPosition.second - position.second)
             }
         }
 
@@ -54,8 +62,28 @@ class GameStartStateGeneratorImpl : GameStartStateGenerator {
         override fun permutation(): List<Int> = permutation
 
         override fun start() {
-            
+            moves.postValue(amountOfMoves)
+            stopWatch.postValue(0)
+            startTime = System.currentTimeMillis()
+            GlobalScope.launch {
+                while (!isGameOver) {
+                    val time = System.currentTimeMillis() - startTime
+                    stopWatch.postValue(time)
+                    delay(DEFAULT_DELAY_TIME)
+                }
+            }
         }
+
+        override fun stop() {
+            isGameOver = true
+            endTime = System.currentTimeMillis()
+            gameTime = endTime - startTime
+            stopWatch.postValue(gameTime)
+        }
+
+        override fun startTime(): Long = startTime
+
+        override fun gameTime(): Long = gameTime
 
         override fun moves(): LiveData<Int> = moves
 
@@ -70,12 +98,18 @@ class GameStartStateGeneratorImpl : GameStartStateGenerator {
             val from = realValue(position)
             val to = realValue(swpPosition)
             val tmp = permutation[from]
-            permutation[to] = permutation[from]
-            permutation[from] = tmp
+            permutation[from] = permutation[to]
+            permutation[to] = tmp
+            incrementMoves()
             notifyChanges()
         }
 
-        private fun isSolved(): Boolean {
+        private fun incrementMoves() {
+            amountOfMoves += 1
+            moves.postValue(amountOfMoves)
+        }
+
+        override fun isSolved(): Boolean {
             for (i in 0 .. SIZE) {
                 if (i != permutation[i])
                     return false
@@ -85,6 +119,7 @@ class GameStartStateGeneratorImpl : GameStartStateGenerator {
 
         private fun notifyChanges() {
             if (isSolved()) {
+                stop()
                 notifySolved()
             } else {
                 notifyGameStateChanged()
@@ -140,7 +175,7 @@ class GameStartStateGeneratorImpl : GameStartStateGenerator {
     private fun generatePermutation(size: Int): ArrayList<Int> {
         val result = ArrayList<Int>()
 
-        for (i in 0 .. size) {
+        for (i in 0 until(size)) {
             result.add(i)
         }
 
