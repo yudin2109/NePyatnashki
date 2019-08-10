@@ -2,8 +2,10 @@ package com.styudint.nepyatnashki.dagger
 
 import android.content.Context
 import androidx.room.Room
-import com.styudint.nepyatnashki.data.StatisticsRepository
-import com.styudint.nepyatnashki.data.StatisticsRepositoryImpl
+import com.styudint.nepyatnashki.data.GameStartStateGenerator
+import com.styudint.nepyatnashki.data.GameStartStateGeneratorImpl
+import com.styudint.nepyatnashki.data.repositories.StatisticsRepository
+import com.styudint.nepyatnashki.data.repositories.StatisticsRepositoryImpl
 import com.styudint.nepyatnashki.room.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -23,5 +25,11 @@ class MainModule(private var context: Context) {
         return Room.databaseBuilder(context, AppDatabase::class.java, "ne_pyatnashki")
             .fallbackToDestructiveMigration()
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providesGameStartStateGenerator(impl: GameStartStateGeneratorImpl): GameStartStateGenerator {
+        return impl
     }
 }

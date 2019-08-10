@@ -2,7 +2,7 @@ package com.styudint.nepyatnashki
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.styudint.nepyatnashki.data.StatisticsRepository
+import com.styudint.nepyatnashki.data.repositories.StatisticsRepository
 import javax.inject.Inject
 
 class StatisticsPageViewModel(app: Application) : AndroidViewModel(app) {

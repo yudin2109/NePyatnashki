@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -11,62 +13,41 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.styudint.nepyatnashki.data.GameInfo;
-import com.styudint.nepyatnashki.data.StatisticsRepository;
+import com.styudint.nepyatnashki.data.GameStartStateGenerator;
+import com.styudint.nepyatnashki.data.GameState;
+import com.styudint.nepyatnashki.data.GameStateListener;
+import com.styudint.nepyatnashki.data.repositories.StatisticsRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.inject.Inject;
 
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements GameStateListener {
     boolean isGameOver = false;
     TextView stepsCounterTextView;
     TextView timerTextView;
     ImageButton[] buttons;
-    int nSteps = 0;
     Bitmap background;
     int size;
     long startTime;
-    int[][] permutation = new int[4][];
-    enum Directions {
-        UP, DOWN, LEFT, RIGHT, NONE
-    }
 
     @Inject
     StatisticsRepository statsRepo;
+
+    @Inject
+    GameStartStateGenerator generator;
+
     long timestamp;
+
+    GameState currentGameState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        timestamp = System.currentTimeMillis();
-
         ((NePyatnashkiApp) getApplication()).getAppComponent().inject(this);
-
-        ArrayList<Integer> randPerm = new ArrayList<>();
-        for (int i = 0; i < 16; i++)
-            randPerm.add(i);
-        Collections.shuffle(randPerm);
-        if (CountInversions(randPerm) % 2 == 1) {
-            if (randPerm.get(0) != 15 && randPerm.get(1) != 15) {
-                int tmp = randPerm.get(0);
-                randPerm.set(0, randPerm.get(1));
-                randPerm.set(1, tmp);
-            } else {
-                int tmp = randPerm.get(2);
-                randPerm.set(2, randPerm.get(3));
-                randPerm.set(3, tmp);
-            }
-        }
-
-        for (int i = 0; i < 4; i++) {
-            permutation[i] = new int[4];
-            for (int j = 0 ; j < 4; j++) {
-                permutation[i][j] = randPerm.get(4 * i + j);
-            }
-        }
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.test_misha);
         background = Bitmap.createScaledBitmap(background, background.getWidth(), background.getHeight(), false);
@@ -90,97 +71,56 @@ public class GameActivity extends AppCompatActivity {
         buttons[14] = (ImageButton) findViewById(R.id.button15);
         buttons[15] = (ImageButton) findViewById(R.id.button16);
 
-        for (int i = 0; i < 16; i++) {
-            int id = permutation[i / 4][i % 4];
-            buttons[i].setImageBitmap(Bitmap.createBitmap(background, (id % 4) * size / 4, (id / 4) * size / 4, size / 4, size / 4));
-            if (id == 15)
-                buttons[i].setVisibility(View.INVISIBLE);
-        }
-
         stepsCounterTextView = findViewById(R.id.stepsCounterTextView);
         timerTextView = findViewById(R.id.timerTextView);
+
+        generator.generate().observe(this, new Observer<GameState>() {
+            @Override
+            public void onChanged(GameState gameState) {
+                currentGameState = gameState;
+                startGame(gameState);
+            }
+        });
+    }
+
+    private void startGame(GameState gameState) {
         startTime = System.currentTimeMillis();
+        timestamp = System.currentTimeMillis();
+
+        gameState.subscribe(this);
+
+        applyGameState(gameState);
 
         startStopWatch();
     }
 
+    private void applyGameState(GameState gameState) {
+        for (int i = 0; i < 16; i++) {
+            int id = gameState.permutation().get(i);
+            buttons[i].setImageBitmap(Bitmap.createBitmap(background, (id % 4) * size / 4, (id / 4) * size / 4, size / 4, size / 4));
+            if (id == 15)
+                buttons[i].setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void gameStateChanged() {
+        applyGameState(currentGameState);
+    }
+
+    @Override
+    public void solved() {
+        Toast.makeText(getApplicationContext(), "Legendary!", Toast.LENGTH_LONG).show();
+        long endTime = System.currentTimeMillis();
+        long time = (endTime - startTime) / 10;
+        statsRepo.saveGame(new GameInfo(startTime, time, true));
+        isGameOver = true;
+    }
 
     public void onClick(View view) {
         int tag = Integer.parseInt(view.getTag().toString());
-        int row = tag / 4;
-        int col = tag % 4;
 
-        Directions direction = Directions.NONE;
-        if (row > 0 && permutation[row - 1][col] == 15)
-            direction = Directions.UP;
-        else if (row < 3 && permutation[row + 1][col] == 15)
-            direction = Directions.DOWN;
-        if (col > 0 && permutation[row][col - 1] == 15)
-            direction = Directions.LEFT;
-        if (col < 3 && permutation[row][col + 1] == 15)
-            direction = Directions.RIGHT;
-
-        if (direction != Directions.NONE) {
-            SwapStates(row, col, direction);
-            ++nSteps;
-            stepsCounterTextView.setText(Integer.toString(nSteps));
-
-            boolean isSolved = true;
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                    isSolved = isSolved & (permutation[i][j] == 4 * i + j);
-                }
-            }
-            if (isSolved) {
-                isGameOver = true;
-                long endTime = System.currentTimeMillis();
-                long time = (endTime - startTime) / 10;
-                statsRepo.saveGame(new GameInfo(startTime, time, true));
-                Toast toast = Toast.makeText(getApplicationContext(), "Legendary!", Toast.LENGTH_LONG);
-                toast.show();
-            }
-        }
-    }
-
-    public void SwapStates(int row, int col, Directions direction) {
-        int targetRow = row, targetCol = col;
-        switch (direction) {
-            case UP:
-                --targetRow;
-                break;
-            case DOWN:
-                ++targetRow;
-                break;
-            case LEFT:
-                --targetCol;
-                break;
-            case RIGHT:
-                ++targetCol;
-        }
-
-        buttons[4 * row + col].setVisibility(View.INVISIBLE);
-        buttons[4 * targetRow + targetCol].setVisibility(View.VISIBLE);
-
-        int tmp = permutation[row][col];
-        permutation[row][col] = permutation[targetRow][targetCol];
-        permutation[targetRow][targetCol] = tmp;
-
-        buttons[4 * targetRow + targetCol].setImageBitmap((Bitmap.createBitmap(background, (tmp % 4) * size / 4, (tmp / 4) * size / 4, size / 4, size / 4)));
-    }
-
-    public int CountInversions(ArrayList<Integer> arrayList) {
-        int result = 0;
-        for (int i = 0; i < arrayList.size(); i++) {
-            if (arrayList.get(i) == 15) {
-                result += (i / 4) + 1;
-            } else {
-                for (int j = i + 1; j < arrayList.size(); j++) {
-                    if (arrayList.get(j) < arrayList.get(i))
-                        ++result;
-                }
-            }
-        }
-        return result;
+        currentGameState.handleTap(tag);
     }
 
     @Override
@@ -197,21 +137,21 @@ public class GameActivity extends AppCompatActivity {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-            try {
-                while (!isGameOver) {
-                    final long currentTime = (System.currentTimeMillis() - startTime) / 10;
-                    timerTextView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                        timerTextView.setText(String.format("%d:%02d:%02d", currentTime / 6000, (currentTime / 100) % 60, currentTime % 100));
-                        }
-                    });
+                try {
+                    while (!isGameOver) {
+                        final long currentTime = (System.currentTimeMillis() - startTime) / 10;
+                        timerTextView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                            timerTextView.setText(String.format("%d:%02d:%02d", currentTime / 6000, (currentTime / 100) % 60, currentTime % 100));
+                            }
+                        });
 
-                    Thread.sleep(16);
+                        Thread.sleep(16);
+                    }
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
                 }
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
             }
         };
 
