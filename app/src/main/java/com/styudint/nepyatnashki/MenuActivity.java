@@ -22,4 +22,8 @@ public class MenuActivity extends AppCompatActivity {
         Intent intent = new Intent(this, StatisticsPage.class);
         startActivity(intent);
     }
+
+    public void onSettingsClicked(View view) {
+        startActivity(new Intent(this, SettingsPage.class));
+    }
 }

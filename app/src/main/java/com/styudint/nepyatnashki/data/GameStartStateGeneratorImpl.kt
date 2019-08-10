@@ -92,8 +92,9 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         private fun move(dX: Int, dY: Int) {
             val position = findEmpty()
             val swpPosition = Pair(position.first - dX, position.second - dY)
-            if (!isValidPosition(swpPosition))
-                throw IllegalStateException("Not a valid position ${swpPosition.first} ${swpPosition.second}")
+            if (!isValidPosition(swpPosition)) {
+                return
+            }
 
             val from = realValue(position)
             val to = realValue(swpPosition)
