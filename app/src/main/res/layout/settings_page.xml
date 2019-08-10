@@ -12,7 +12,7 @@
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:gravity="center"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textColor="@color/darkBlack"
     />
 
@@ -20,9 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:padding="16dp"
         android:id="@+id/controlModeSetting"
     >
         <TextView
@@ -30,12 +28,14 @@
             android:layout_height="wrap_content"
             android:text="@string/control_mode_string"
             android:layout_weight="1"
+            android:textSize="20sp"
         />
         <TextView
             android:id="@+id/controlMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorAccent"
+            android:textSize="20sp"
         />
     </LinearLayout>
 </LinearLayout>

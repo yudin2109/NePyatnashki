@@ -20,6 +20,8 @@ class SettingsPage : FragmentActivity(), SettingsManagerListener {
 
         (application as NePyatnashkiApp).appComponent.inject(this)
 
+        settingsManager.subscribe(this)
+
         controlModeSetting.setOnClickListener {
             val dialog = ChooseDialog(this, prepareStrings(ControlModeInfo))
             dialog.setPositiveCallback {

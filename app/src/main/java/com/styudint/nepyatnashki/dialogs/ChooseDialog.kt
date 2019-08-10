@@ -21,7 +21,7 @@ class ChooseDialog(private var ctx: Context, private var list: List<String>) : A
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = createView()
-        view.spinner.adapter = ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_item, list)
+        view.spinner.adapter = ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_dropdown_item, list)
         return AlertDialog.Builder(ctx)
             .setView(view)
             .setPositiveButton(R.string.ok_string) { _, _ -> okCallback?.invoke(view.spinner.selectedItem as String) }
