@@ -1,8 +1,9 @@
-package com.styudint.nepyatnashki.data
+package com.styudint.nepyatnashki.data.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import com.styudint.nepyatnashki.data.GameInfo
 import com.styudint.nepyatnashki.room.AppDatabase
 import com.styudint.nepyatnashki.room.GameInfoEntity
 import kotlinx.coroutines.GlobalScope

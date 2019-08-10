@@ -2,9 +2,13 @@ package com.styudint.nepyatnashki.dagger
 
 import android.content.Context
 import androidx.room.Room
-import com.styudint.nepyatnashki.data.StatisticsRepository
-import com.styudint.nepyatnashki.data.StatisticsRepositoryImpl
+import com.styudint.nepyatnashki.data.GameStartStateGenerator
+import com.styudint.nepyatnashki.data.GameStartStateGeneratorImpl
+import com.styudint.nepyatnashki.data.repositories.StatisticsRepository
+import com.styudint.nepyatnashki.data.repositories.StatisticsRepositoryImpl
 import com.styudint.nepyatnashki.room.AppDatabase
+import com.styudint.nepyatnashki.settings.SettingsManager
+import com.styudint.nepyatnashki.settings.SettingsManagerImpl
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -24,4 +28,12 @@ class MainModule(private var context: Context) {
             .fallbackToDestructiveMigration()
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun providesGameStartStateGenerator(impl: GameStartStateGeneratorImpl): GameStartStateGenerator = impl
+
+    @Provides
+    @Singleton
+    fun providesSettingsManager(impl: SettingsManagerImpl): SettingsManager = impl
 }

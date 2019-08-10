@@ -35,7 +35,10 @@ class StatisticsPage : FragmentActivity() {
         return timestamp.toString()
     }
 
-    private fun formatTime(time: Long): String = String.format("%d:%02d:%02d", time / 6000, (time / 100) % 60, time % 100)
+    private fun formatTime(time: Long): String {
+        var bufferTime = time / 10
+        return String.format("%d:%02d:%02d", bufferTime / 6000, (bufferTime / 100) % 60, bufferTime % 100)
+    }
 
     private fun createStatsView(info: GameInfo): View {
         val view = LayoutInflater.from(this).inflate(R.layout.stats_row, null)

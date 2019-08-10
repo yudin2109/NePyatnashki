@@ -2,4 +2,11 @@
     <string name="app_name">NePyatnashki</string>
     <string name="watch_your_stats_string">Watch your stats</string>
     <string name="statistics_string">Statistics</string>
+    <string name="our_main_string">СОБЕРИ ЕБАЛО МИШЕ</string>
+    <string name="settings_string">Settings</string>
+    <string name="control_mode_string">Control mode</string>
+    <string name="control_mode_clicks_string">Control by clicks</string>
+    <string name="control_mode_swipes_string">Control by swipes</string>
+    <string name="ok_string">Ok</string>
+    <string name="cancel_string">Cancel</string>
 </resources>

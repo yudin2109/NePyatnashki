@@ -4,218 +4,206 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.lifecycle.Observer;
+
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.styudint.nepyatnashki.data.GameInfo;
-import com.styudint.nepyatnashki.data.StatisticsRepository;
+import com.styudint.nepyatnashki.data.GameStartStateGenerator;
+import com.styudint.nepyatnashki.data.GameState;
+import com.styudint.nepyatnashki.data.GameStateListener;
+import com.styudint.nepyatnashki.data.repositories.StatisticsRepository;
+import com.styudint.nepyatnashki.settings.ControlMode;
+import com.styudint.nepyatnashki.settings.SettingsManager;
+import com.styudint.nepyatnashki.settings.SettingsManagerListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import javax.inject.Inject;
 
-public class GameActivity extends AppCompatActivity {
-    boolean isGameOver = false;
+public class GameActivity extends AppCompatActivity implements GameStateListener, SettingsManagerListener {
+    static float swipeThreshold = 120f;
+
     TextView stepsCounterTextView;
     TextView timerTextView;
-    ImageButton[] buttons;
-    int nSteps = 0;
+    ArrayList<ImageButton> buttons = new ArrayList<>();
     Bitmap background;
     int size;
-    long startTime;
-    int[][] permutation = new int[4][];
-    enum Directions {
-        UP, DOWN, LEFT, RIGHT, NONE
-    }
+
+    GestureDetectorCompat gestureDetector;
 
     @Inject
     StatisticsRepository statsRepo;
-    long timestamp;
+
+    @Inject
+    GameStartStateGenerator generator;
+
+    @Inject
+    SettingsManager settingsManager;
+
+    GameState currentGameState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        timestamp = System.currentTimeMillis();
-
         ((NePyatnashkiApp) getApplication()).getAppComponent().inject(this);
 
-        ArrayList<Integer> randPerm = new ArrayList<>();
-        for (int i = 0; i < 16; i++)
-            randPerm.add(i);
-        Collections.shuffle(randPerm);
-        if (CountInversions(randPerm) % 2 == 1) {
-            if (randPerm.get(0) != 15 && randPerm.get(1) != 15) {
-                int tmp = randPerm.get(0);
-                randPerm.set(0, randPerm.get(1));
-                randPerm.set(1, tmp);
-            } else {
-                int tmp = randPerm.get(2);
-                randPerm.set(2, randPerm.get(3));
-                randPerm.set(3, tmp);
-            }
-        }
-
-        for (int i = 0; i < 4; i++) {
-            permutation[i] = new int[4];
-            for (int j = 0 ; j < 4; j++) {
-                permutation[i][j] = randPerm.get(4 * i + j);
-            }
-        }
+        gestureDetector = new GestureDetectorCompat(this, new GestureListener());
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.test_misha);
         background = Bitmap.createScaledBitmap(background, background.getWidth(), background.getHeight(), false);
         size = background.getHeight();
 
-        buttons = new ImageButton[16];
-        buttons[0] = (ImageButton) findViewById(R.id.button1);
-        buttons[1] = (ImageButton) findViewById(R.id.button2);
-        buttons[2] = (ImageButton) findViewById(R.id.button3);
-        buttons[3] = (ImageButton) findViewById(R.id.button4);
-        buttons[4] = (ImageButton) findViewById(R.id.button5);
-        buttons[5] = (ImageButton) findViewById(R.id.button6);
-        buttons[6] = (ImageButton) findViewById(R.id.button7);
-        buttons[7] = (ImageButton) findViewById(R.id.button8);
-        buttons[8] = (ImageButton) findViewById(R.id.button9);
-        buttons[9] = (ImageButton) findViewById(R.id.button10);
-        buttons[10] = (ImageButton) findViewById(R.id.button11);
-        buttons[11] = (ImageButton) findViewById(R.id.button12);
-        buttons[12] = (ImageButton) findViewById(R.id.button13);
-        buttons[13] = (ImageButton) findViewById(R.id.button14);
-        buttons[14] = (ImageButton) findViewById(R.id.button15);
-        buttons[15] = (ImageButton) findViewById(R.id.button16);
-
-        for (int i = 0; i < 16; i++) {
-            int id = permutation[i / 4][i % 4];
-            buttons[i].setImageBitmap(Bitmap.createBitmap(background, (id % 4) * size / 4, (id / 4) * size / 4, size / 4, size / 4));
-            if (id == 15)
-                buttons[i].setVisibility(View.INVISIBLE);
-        }
+        buttons.add((ImageButton) findViewById(R.id.button1));
+        buttons.add((ImageButton) findViewById(R.id.button2));
+        buttons.add((ImageButton) findViewById(R.id.button3));
+        buttons.add((ImageButton) findViewById(R.id.button4));
+        buttons.add((ImageButton) findViewById(R.id.button5));
+        buttons.add((ImageButton) findViewById(R.id.button6));
+        buttons.add((ImageButton) findViewById(R.id.button7));
+        buttons.add((ImageButton) findViewById(R.id.button8));
+        buttons.add((ImageButton) findViewById(R.id.button9));
+        buttons.add((ImageButton) findViewById(R.id.button10));
+        buttons.add((ImageButton) findViewById(R.id.button11));
+        buttons.add((ImageButton) findViewById(R.id.button12));
+        buttons.add((ImageButton) findViewById(R.id.button13));
+        buttons.add((ImageButton) findViewById(R.id.button14));
+        buttons.add((ImageButton) findViewById(R.id.button15));
+        buttons.add((ImageButton) findViewById(R.id.button16));
 
         stepsCounterTextView = findViewById(R.id.stepsCounterTextView);
         timerTextView = findViewById(R.id.timerTextView);
-        startTime = System.currentTimeMillis();
 
-        startStopWatch();
+        generator.generate().observe(this, new Observer<GameState>() {
+            @Override
+            public void onChanged(GameState gameState) {
+                currentGameState = gameState;
+                startGame(gameState);
+            }
+        });
+
+        settingsManager.subscribe(this);
     }
 
+    private void startGame(GameState gameState) {
+        gameState.start();
+        gameState.subscribe(this);
+        gameState.moves().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                stepsCounterTextView.setText(integer.toString());
+            }
+        });
+        gameState.stopWatch().observe(this, new Observer<Long>() {
+            @Override
+            public void onChanged(Long timeValue) {
+                timerTextView.setText(formatTime(timeValue));
+            }
+        });
+
+        applyGameState(gameState);
+    }
+
+    private String formatTime(long time) {
+        time /= 10;
+        return String.format("%d:%02d:%02d", time / 6000, (time / 100) % 60, time % 100);
+    }
+
+    private void applyGameState(GameState gameState) {
+        for (int i = 0; i < 16; i++) {
+            int id = gameState.permutation().get(i);
+            buttons.get(i).setImageBitmap(Bitmap.createBitmap(background, (id % 4) * size / 4, (id / 4) * size / 4, size / 4, size / 4));
+            if (id == 15) {
+                buttons.get(i).setVisibility(View.INVISIBLE);
+            } else {
+                buttons.get(i).setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public void gameStateChanged() {
+        applyGameState(currentGameState);
+    }
+
+    @Override
+    public void solved() {
+        Toast.makeText(getApplicationContext(), "Legendary!", Toast.LENGTH_LONG).show();
+        statsRepo.saveGame(new GameInfo(currentGameState.startTime(), currentGameState.gameTime(), true));
+    }
 
     public void onClick(View view) {
         int tag = Integer.parseInt(view.getTag().toString());
-        int row = tag / 4;
-        int col = tag % 4;
-
-        Directions direction = Directions.NONE;
-        if (row > 0 && permutation[row - 1][col] == 15)
-            direction = Directions.UP;
-        else if (row < 3 && permutation[row + 1][col] == 15)
-            direction = Directions.DOWN;
-        if (col > 0 && permutation[row][col - 1] == 15)
-            direction = Directions.LEFT;
-        if (col < 3 && permutation[row][col + 1] == 15)
-            direction = Directions.RIGHT;
-
-        if (direction != Directions.NONE) {
-            SwapStates(row, col, direction);
-            ++nSteps;
-            stepsCounterTextView.setText(Integer.toString(nSteps));
-
-            boolean isSolved = true;
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                    isSolved = isSolved & (permutation[i][j] == 4 * i + j);
-                }
-            }
-            if (isSolved) {
-                isGameOver = true;
-                long endTime = System.currentTimeMillis();
-                long time = (endTime - startTime) / 10;
-                statsRepo.saveGame(new GameInfo(startTime, time, true));
-                Toast toast = Toast.makeText(getApplicationContext(), "Legendary!", Toast.LENGTH_LONG);
-                toast.show();
-            }
+        if (settingsManager.controlMode() == ControlMode.CLICKS) {
+            currentGameState.handleTap(tag);
         }
-    }
-
-    public void SwapStates(int row, int col, Directions direction) {
-        int targetRow = row, targetCol = col;
-        switch (direction) {
-            case UP:
-                --targetRow;
-                break;
-            case DOWN:
-                ++targetRow;
-                break;
-            case LEFT:
-                --targetCol;
-                break;
-            case RIGHT:
-                ++targetCol;
-        }
-
-        buttons[4 * row + col].setVisibility(View.INVISIBLE);
-        buttons[4 * targetRow + targetCol].setVisibility(View.VISIBLE);
-
-        int tmp = permutation[row][col];
-        permutation[row][col] = permutation[targetRow][targetCol];
-        permutation[targetRow][targetCol] = tmp;
-
-        buttons[4 * targetRow + targetCol].setImageBitmap((Bitmap.createBitmap(background, (tmp % 4) * size / 4, (tmp / 4) * size / 4, size / 4, size / 4)));
-    }
-
-    public int CountInversions(ArrayList<Integer> arrayList) {
-        int result = 0;
-        for (int i = 0; i < arrayList.size(); i++) {
-            if (arrayList.get(i) == 15) {
-                result += (i / 4) + 1;
-            } else {
-                for (int j = i + 1; j < arrayList.size(); j++) {
-                    if (arrayList.get(j) < arrayList.get(i))
-                        ++result;
-                }
-            }
-        }
-        return result;
     }
 
     @Override
     public void onBackPressed() {
-        if (!isGameOver) {
-            long endTime = System.currentTimeMillis();
-            long time = (endTime - startTime) / 10;
-            statsRepo.saveGame(new GameInfo(startTime, time, false));
+        currentGameState.stop();
+        if (!currentGameState.isSolved()) {
+            statsRepo.saveGame(new GameInfo(currentGameState.startTime(), currentGameState.gameTime(), false));
         }
         finish();
     }
 
-    public void startStopWatch() {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-            try {
-                while (!isGameOver) {
-                    final long currentTime = (System.currentTimeMillis() - startTime) / 10;
-                    timerTextView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                        timerTextView.setText(String.format("%d:%02d:%02d", currentTime / 6000, (currentTime / 100) % 60, currentTime % 100));
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        gestureDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void settingsChanged() {
+        if (settingsManager.controlMode() == ControlMode.CLICKS) {
+            for (ImageButton btn : buttons) {
+                btn.setClickable(true);
+            }
+        } else if (settingsManager.controlMode() == ControlMode.SWIPES) {
+            for (ImageButton btn : buttons) {
+                btn.setClickable(false);
+            }
+        }
+    }
+
+    class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            float dX = e2.getX() - e1.getX();
+            float dY = e2.getY() - e1.getY();
+
+            if (settingsManager.controlMode() == ControlMode.SWIPES) {
+                if (Math.abs(dX) > Math.abs(dY)) {
+                    if (Math.abs(dX) > swipeThreshold) {
+                        if (dX < 0) {
+                            currentGameState.moveLeft();
+                        } else {
+                            currentGameState.moveRight();
                         }
-                    });
-
-                    Thread.sleep(16);
+                    }
+                } else {
+                    if (Math.abs(dY) > swipeThreshold) {
+                        if (dY < 0) {
+                            currentGameState.moveUp();
+                        } else {
+                            currentGameState.moveDown();
+                        }
+                    }
                 }
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
             }
-            }
-        };
 
-        Thread thread = new Thread(runnable);
-        thread.start();
+            return super.onFling(e1, e2, velocityX, velocityY);
+        }
     }
 }
