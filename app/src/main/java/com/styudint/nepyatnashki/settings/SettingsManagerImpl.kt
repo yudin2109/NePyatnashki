@@ -1,23 +1,44 @@
 package com.styudint.nepyatnashki.settings
 
+import com.styudint.nepyatnashki.room.AppDatabase
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * Currently just for testing ;)
- */
-
-class SettingsManagerImpl @Inject constructor() : SettingsManager {
+class SettingsManagerImpl @Inject constructor(
+    private val appDatabase: AppDatabase
+) : SettingsManager {
     private val listeners = ArrayList<SettingsManagerListener>()
 
-    private var controlMode = ControlMode.SWIPES
+    private var settings = Settings()
+
+    init {
+        GlobalScope.launch {
+            with (appDatabase.settingsDao()) {
+                val fromDatabase = get()
+                if (fromDatabase == null) {
+                    insert(settings)
+                } else {
+                    settings = fromDatabase
+                    notifySettingsChanged()
+                }
+            }
+        }
+    }
 
     override fun changeControlMode(mode: ControlMode) {
-        controlMode = mode
+        settings.controlMode = mode
         notifySettingsChanged()
     }
 
     override fun controlMode(): ControlMode {
-        return controlMode
+        return settings.controlMode
+    }
+
+    private fun saveToDatabase() {
+        GlobalScope.launch {
+            appDatabase.settingsDao().update(settings)
+        }
     }
 
     override fun subscribe(listener: SettingsManagerListener) {
@@ -30,6 +51,7 @@ class SettingsManagerImpl @Inject constructor() : SettingsManager {
     }
 
     private fun notifySettingsChanged() {
+        saveToDatabase()
         listeners.forEach {
             it.settingsChanged()
         }
