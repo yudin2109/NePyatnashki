@@ -9,6 +9,9 @@ import androidx.lifecycle.ViewModelProviders
 import com.styudint.nepyatnashki.data.GameInfo
 import kotlinx.android.synthetic.main.statistics_page.*
 import kotlinx.android.synthetic.main.stats_row.view.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class StatisticsPage : FragmentActivity() {
     lateinit var viewModel: StatisticsPageViewModel
@@ -32,7 +35,10 @@ class StatisticsPage : FragmentActivity() {
     }
 
     private fun formatTimestamp(timestamp: Long): String {
-        return timestamp.toString()
+        val gameDate = Date(timestamp)
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy\nHH:mm")
+        return dateFormat.format(gameDate)
+        //return timestamp.toString()
     }
 
     private fun formatTime(time: Long): String {
