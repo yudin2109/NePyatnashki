@@ -111,7 +111,7 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         }
 
         override fun isSolved(): Boolean {
-            for (i in 0 .. SIZE) {
+            for (i in 0 until SIZE) {
                 if (i != permutation[i])
                     return false
             }
@@ -120,6 +120,7 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
 
         private fun notifyChanges() {
             if (isSolved()) {
+                notifyGameStateChanged()
                 stop()
                 notifySolved()
             } else {
@@ -142,6 +143,7 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         private fun realValue(position: Pair<Int, Int>): Int = position.first * 4 + position.second
 
         private fun isValidPosition(position: Pair<Int, Int>): Boolean {
+            // Can we use if (X in 0..4)?
             if (position.first < 0 || position.first >= 4) return false
             if (position.second < 0 || position.second >= 4) return false
             return true
@@ -150,6 +152,7 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         private fun findEmpty(): Pair<Int, Int> = positionByValue(SIZE - 1)
 
         private fun positionByValue(value: Int): Pair<Int, Int> {
+            // Lol what: there is value, but it is never used
             for (i in 0 .. SIZE) {
                 if (permutation[i] == SIZE - 1) {
                     return Pair(i / 4, i % 4)
