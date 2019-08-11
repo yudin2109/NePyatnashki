@@ -18,4 +18,13 @@
         <item name="android:adjustViewBounds">true</item>
     </style>
 
+    <style name="CustomSignInButtonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:background">@drawable/round_sign_in_button</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="CustomRegisterButtonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:background">@drawable/round_register_button</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
 </resources>

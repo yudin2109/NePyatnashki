@@ -9,4 +9,8 @@
     <string name="control_mode_swipes_string">Control by swipes</string>
     <string name="ok_string">Ok</string>
     <string name="cancel_string">Cancel</string>
+    <string name="sign_in_string">Sign in</string>
+    <string name="sign_in_page_header_string">Sign In Page</string>
+    <string name="register_string">Register</string>
+    <string name="sign_in_register_greetings_string">Enter your credentials to sign in or register into application</string>
 </resources>

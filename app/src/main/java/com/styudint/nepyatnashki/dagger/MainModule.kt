@@ -2,6 +2,8 @@ package com.styudint.nepyatnashki.dagger
 
 import android.content.Context
 import androidx.room.Room
+import com.styudint.nepyatnashki.account.AccountManager
+import com.styudint.nepyatnashki.account.AccountManagerImpl
 import com.styudint.nepyatnashki.data.GameStartStateGenerator
 import com.styudint.nepyatnashki.data.GameStartStateGeneratorImpl
 import com.styudint.nepyatnashki.data.repositories.StatisticsRepository
@@ -36,4 +38,8 @@ class MainModule(private var context: Context) {
     @Provides
     @Singleton
     fun providesSettingsManager(impl: SettingsManagerImpl): SettingsManager = impl
+
+    @Provides
+    @Singleton
+    fun providesAccountManager(impl: AccountManagerImpl): AccountManager = impl
 }
