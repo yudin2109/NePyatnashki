@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "383440032593",
+    "firebase_url": "https://nepyatnashki.firebaseio.com",
+    "project_id": "nepyatnashki",
+    "storage_bucket": "nepyatnashki.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:383440032593:android:0436bb3ce1f40bba",
+        "android_client_info": {
+          "package_name": "com.styudint.nepyatnashki"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "383440032593-kb24iqgmg4ukcnlin2loei23dda2otih.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnYUKAUOly8nkMrnjs_4-OZzm76OMZ4rA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "383440032593-kb24iqgmg4ukcnlin2loei23dda2otih.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
