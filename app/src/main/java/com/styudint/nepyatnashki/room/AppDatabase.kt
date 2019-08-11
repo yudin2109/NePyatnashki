@@ -7,7 +7,7 @@ import com.styudint.nepyatnashki.settings.Settings
 @Database(
     entities = [GameInfoEntity::class, Settings::class],
     exportSchema = false,
-    version = 3
+    version = 4
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun gameInfoDao(): GameInfoDao

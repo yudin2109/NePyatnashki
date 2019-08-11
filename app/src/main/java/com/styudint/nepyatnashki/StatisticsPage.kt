@@ -38,7 +38,6 @@ class StatisticsPage : FragmentActivity() {
         val gameDate = Date(timestamp)
         val dateFormat = SimpleDateFormat("dd.MM.yyyy\nHH:mm")
         return dateFormat.format(gameDate)
-        //return timestamp.toString()
     }
 
     private fun formatTime(time: Long): String {

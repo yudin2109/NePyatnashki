@@ -12,10 +12,11 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseUser;
+import com.styudint.nepyatnashki.account.AccountManager;
 import com.styudint.nepyatnashki.data.GameInfo;
 import com.styudint.nepyatnashki.data.GameStartStateGenerator;
 import com.styudint.nepyatnashki.data.GameState;
@@ -48,6 +49,9 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
 
     @Inject
     SettingsManager settingsManager;
+
+    @Inject
+    AccountManager accountManager;
 
     GameState currentGameState;
 
@@ -139,7 +143,12 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
     @Override
     public void solved() {
         Toast.makeText(getApplicationContext(), "Legendary!", Toast.LENGTH_LONG).show();
-        statsRepo.saveGame(new GameInfo(currentGameState.startTime(), currentGameState.gameTime(), true));
+        FirebaseUser user = accountManager.currentUser();
+        statsRepo.saveGame(new GameInfo(
+            currentGameState.startTime(),
+            currentGameState.gameTime(),
+            true,
+            user == null ? null : user.getUid()));
     }
 
     public void onClick(View view) {
@@ -152,8 +161,13 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
     @Override
     public void onBackPressed() {
         currentGameState.stop();
+        FirebaseUser user = accountManager.currentUser();
         if (!currentGameState.isSolved()) {
-            statsRepo.saveGame(new GameInfo(currentGameState.startTime(), currentGameState.gameTime(), false));
+            statsRepo.saveGame(new GameInfo(
+                currentGameState.startTime(),
+                currentGameState.gameTime(),
+                false,
+                user == null ? null : user.getUid()));
         }
         finish();
     }
@@ -175,6 +189,18 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
                 btn.setClickable(false);
             }
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        settingsManager.unsubscribe(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        settingsManager.subscribe(this);
     }
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {

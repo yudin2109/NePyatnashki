@@ -12,6 +12,7 @@ class GameInfoEntity {
     var timestamp: Long = 0
     var time: Long = 0
     var ended: Boolean = false
+    var userUid: String? = null
 
     constructor()
 
@@ -19,5 +20,6 @@ class GameInfoEntity {
         timestamp = info.timestamp
         time = info.time
         ended = info.ended
+        userUid = info.userUid
     }
 }

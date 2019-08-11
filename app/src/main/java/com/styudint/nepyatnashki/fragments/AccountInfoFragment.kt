@@ -24,6 +24,19 @@ class AccountInfoFragment(private val application: NePyatnashkiApp) : Fragment()
         super.onViewCreated(view, savedInstanceState)
         application.appComponent.inject(this)
         accountManager.subscribe(this)
+        logoutButton.setOnClickListener {
+            accountManager.logout()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        accountManager.unsubscribe(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        accountManager.subscribe(this)
     }
 
     override fun accountHasChanged() {
@@ -31,9 +44,6 @@ class AccountInfoFragment(private val application: NePyatnashkiApp) : Fragment()
         if (user != null) {
             login.text = user.displayName
             email.text = user.email
-        } else { // Might be unused, but for debug it can be useful
-            login.text = "Unknown"
-            email.text = ""
         }
     }
 }
