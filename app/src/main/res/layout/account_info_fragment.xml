@@ -13,6 +13,7 @@
         android:gravity="center"
         tools:text="Login"
         android:padding="8dp"
+        android:visibility="gone"
     />
     <TextView
         android:id="@+id/email"
@@ -23,5 +24,14 @@
         android:textSize="18sp"
         android:padding="8dp"
     />
-
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/logoutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/log_out_string"
+        style="@style/CustomLogOutButtonStyle"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:layout_marginTop="8dp"
+    />
 </LinearLayout>

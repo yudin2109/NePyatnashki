@@ -27,4 +27,9 @@
         <item name="android:background">@drawable/round_register_button</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="CustomLogOutButtonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:background">@drawable/round_log_out_button</item>
+        <item name="android:textColor">@color/themeColor</item>
+    </style>
 </resources>
