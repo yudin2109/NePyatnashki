@@ -75,10 +75,12 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         }
 
         override fun stop() {
-            isGameOver = true
-            endTime = System.currentTimeMillis()
-            gameTime = endTime - startTime
-            stopWatch.postValue(gameTime)
+            if (!isGameOver) {
+                isGameOver = true
+                endTime = System.currentTimeMillis()
+                gameTime = endTime - startTime
+                stopWatch.postValue(gameTime)
+            }
         }
 
         override fun startTime(): Long = startTime
