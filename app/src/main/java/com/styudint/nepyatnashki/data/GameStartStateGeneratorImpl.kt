@@ -147,18 +147,16 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         private fun realValue(position: Pair<Int, Int>): Int = position.first * 4 + position.second
 
         private fun isValidPosition(position: Pair<Int, Int>): Boolean {
-            // Can we use if (X in 0..4)?
-            if (position.first < 0 || position.first >= 4) return false
-            if (position.second < 0 || position.second >= 4) return false
+            if (position.first !in 0..4) return false
+            if (position.second !in 0..4) return false
             return true
         }
 
         private fun findEmpty(): Pair<Int, Int> = positionByValue(SIZE - 1)
 
         private fun positionByValue(value: Int): Pair<Int, Int> {
-            // Lol what: there is value, but it is never used
             for (i in 0 .. SIZE) {
-                if (permutation[i] == SIZE - 1) {
+                if (permutation[i] == value) {
                     return Pair(i / 4, i % 4)
                 }
             }

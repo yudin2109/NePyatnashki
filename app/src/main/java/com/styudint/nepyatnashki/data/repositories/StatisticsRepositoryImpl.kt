@@ -22,7 +22,7 @@ class StatisticsRepositoryImpl @Inject constructor(
     override fun statistics(): LiveData<List<GameInfo>> = Transformations.map(statsLiveData) { it -> run {
         val result = ArrayList<GameInfo>()
         it.forEach {
-            result.add(GameInfo(it.timestamp, it.time, it.nMoves,it.ended, it.userUid))
+            result.add(GameInfo(it.timestamp, it.time, it.nMoves, it.ended, it.userUid))
         }
         result
     }}
