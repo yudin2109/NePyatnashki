@@ -89,6 +89,8 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
 
         override fun moves(): LiveData<Int> = moves
 
+        override fun amountOfMoves(): Int = amountOfMoves
+
         override fun stopWatch(): LiveData<Long> = stopWatch
 
         private fun move(dX: Int, dY: Int) {

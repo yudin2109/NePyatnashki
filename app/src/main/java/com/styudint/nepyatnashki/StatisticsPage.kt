@@ -50,6 +50,7 @@ class StatisticsPage : FragmentActivity() {
 
         view.timestamp.text = formatTimestamp(info.timestamp)
         view.time.text = formatTime(info.time)
+        view.nMoves.text = info.nMoves.toString()
 
         var ended = "No"
         view.ended.setTextColor(resources.getColor(R.color.red))

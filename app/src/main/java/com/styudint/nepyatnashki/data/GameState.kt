@@ -20,6 +20,7 @@ interface GameState {
 
     fun startTime(): Long
     fun gameTime(): Long
+    fun amountOfMoves(): Int
 
     fun start()
     fun stop()
