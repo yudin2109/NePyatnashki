@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.styudint.nepyatnashki.account.AccountManager;
+import com.styudint.nepyatnashki.data.BitmapCache;
 import com.styudint.nepyatnashki.data.GameInfo;
 import com.styudint.nepyatnashki.data.GameStartStateGenerator;
 import com.styudint.nepyatnashki.data.GameState;
@@ -36,8 +37,6 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
     TextView stepsCounterTextView;
     TextView timerTextView;
     ArrayList<ImageButton> buttons = new ArrayList<>();
-    Bitmap background;
-    int size;
 
     GestureDetectorCompat gestureDetector;
 
@@ -53,6 +52,9 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
     @Inject
     AccountManager accountManager;
 
+    @Inject
+    BitmapCache bitmapCache;
+
     GameState currentGameState;
 
     @Override
@@ -64,9 +66,12 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
 
         gestureDetector = new GestureDetectorCompat(this, new GestureListener());
 
-        background = BitmapFactory.decodeResource(getResources(), R.drawable.test_misha);
+        Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.test_misha);
         background = Bitmap.createScaledBitmap(background, background.getWidth(), background.getHeight(), false);
-        size = background.getHeight();
+        int size = Math.min(background.getWidth(), background.getHeight());
+
+        bitmapCache.initialize(background);
+        bitmapCache.setupSizeBounds(0, 0, size, size);
 
         buttons.add((ImageButton) findViewById(R.id.button1));
         buttons.add((ImageButton) findViewById(R.id.button2));
@@ -126,7 +131,7 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
     private void applyGameState(GameState gameState) {
         for (int i = 0; i < 16; i++) {
             int id = gameState.permutation().get(i);
-            buttons.get(i).setImageBitmap(Bitmap.createBitmap(background, (id % 4) * size / 4, (id / 4) * size / 4, size / 4, size / 4));
+            buttons.get(i).setImageBitmap(bitmapCache.getBitmapForId(id));
             if (id == 15) {
                 buttons.get(i).setVisibility(View.INVISIBLE);
             } else {

@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.styudint.nepyatnashki.account.AccountManager
 import com.styudint.nepyatnashki.account.AccountManagerImpl
-import com.styudint.nepyatnashki.data.GameStartStateGenerator
-import com.styudint.nepyatnashki.data.GameStartStateGeneratorImpl
+import com.styudint.nepyatnashki.data.*
 import com.styudint.nepyatnashki.data.repositories.StatisticsRepository
 import com.styudint.nepyatnashki.data.repositories.StatisticsRepositoryImpl
 import com.styudint.nepyatnashki.room.AppDatabase
@@ -42,4 +41,11 @@ class MainModule(private var context: Context) {
     @Provides
     @Singleton
     fun providesAccountManager(impl: AccountManagerImpl): AccountManager = impl
+
+    @Provides
+    fun providesBitmapCache(impl: BitmapCacheImpl): BitmapCache = impl
+
+    @Provides
+    @Singleton
+    fun providesImageHolder(): ImageHolder = ImageHolderImpl(context)
 }
