@@ -1,6 +1,7 @@
 package com.styudint.nepyatnashki.dagger
 
 import com.styudint.nepyatnashki.*
+import com.styudint.nepyatnashki.adapters.GalleryAdapter
 import com.styudint.nepyatnashki.fragments.AccountInfoFragment
 import dagger.Component
 import javax.inject.Singleton
@@ -14,4 +15,5 @@ interface AppComponent {
     fun inject(accountInfoFragment: AccountInfoFragment)
     fun inject(signInPage: SignInPage)
     fun inject(menuActivity: MenuActivity)
+    fun inject(adapter: GalleryAdapter)
 }

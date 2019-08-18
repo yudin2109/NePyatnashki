@@ -14,4 +14,5 @@
     <string name="register_string">Register</string>
     <string name="sign_in_register_greetings_string">Enter your credentials to sign in or register into application</string>
     <string name="log_out_string">Log out</string>
+    <string name="gallery_page_header_string">Gallery</string>
 </resources>

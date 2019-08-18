@@ -23,6 +23,7 @@
         <activity android:name=".StatisticsPage" />
         <activity android:name=".SettingsPage" />
         <activity android:name=".SignInPage" />
+        <activity android:name=".GalleryPage" />
     </application>
 
 </manifest>
