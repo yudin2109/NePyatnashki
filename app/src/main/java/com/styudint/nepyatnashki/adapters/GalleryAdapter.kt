@@ -82,6 +82,10 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
                 view.setOnClickListener {
                     picked(view, adapter.getResourceInfo(i))
                 }
+                if (adapter.getResourceInfo(i) == imageHolder.info()) {
+                    view.findViewById<ImageView>(R.id.overlay).visibility = View.VISIBLE
+                    picked = view
+                }
                 rows[i / 4].addView(view)
             }
 

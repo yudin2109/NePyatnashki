@@ -15,6 +15,7 @@ import com.styudint.nepyatnashki.R
 
 class ImageHolderImpl constructor(private val ctx: Context) : ImageHolder {
     private val liveData = MutableLiveData<Bitmap>()
+    private var currentInfo: ResourceInfo? = null
 
     init {
         loadResource(R.drawable.test_misha)
@@ -29,6 +30,7 @@ class ImageHolderImpl constructor(private val ctx: Context) : ImageHolder {
             val picturePath = cursor.getString(columnIndex)
             cursor.close()
             val bitmap = BitmapFactory.decodeFile(picturePath)
+            currentInfo = ResourceInfo.fromUri(uri)
             liveData.postValue(bitmap)
         }
     }
@@ -37,6 +39,7 @@ class ImageHolderImpl constructor(private val ctx: Context) : ImageHolder {
         GlobalScope.launch {
             var background = BitmapFactory.decodeResource(ctx.resources, resId)
             background = Bitmap.createScaledBitmap(background, background.width, background.height, false)
+            currentInfo = ResourceInfo.fromResource(resId)
             liveData.postValue(background)
         }
     }
@@ -53,6 +56,8 @@ class ImageHolderImpl constructor(private val ctx: Context) : ImageHolder {
             loadResource(resId)
         }
     }
+
+    override fun info(): ResourceInfo? = currentInfo
 
     override fun bitmap(): LiveData<Bitmap> = liveData
 

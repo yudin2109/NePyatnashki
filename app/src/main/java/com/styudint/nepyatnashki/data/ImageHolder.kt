@@ -9,5 +9,7 @@ interface ImageHolder {
     fun loadResource(resId: Int)
     fun loadFromResourceInfo(info: ResourceInfo)
 
+    fun info(): ResourceInfo?
+
     fun bitmap(): LiveData<Bitmap>
 }
