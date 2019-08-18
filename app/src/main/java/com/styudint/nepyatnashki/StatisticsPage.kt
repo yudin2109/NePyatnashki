@@ -29,7 +29,8 @@ class StatisticsPage : FragmentActivity() {
                 anchor.removeView(it)
             }
             list.forEach {
-                anchor.addView(createStatsView(it))
+                val view = createStatsView(it)
+                anchor.addView(view)
             }
         }})
     }
@@ -41,7 +42,7 @@ class StatisticsPage : FragmentActivity() {
     }
 
     private fun formatTime(time: Long): String {
-        var bufferTime = time / 10
+        val bufferTime = time / 10
         return String.format("%d:%02d:%02d", bufferTime / 6000, (bufferTime / 100) % 60, bufferTime % 100)
     }
 
