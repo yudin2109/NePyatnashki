@@ -1,7 +1,6 @@
 package com.styudint.nepyatnashki;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
@@ -22,6 +21,7 @@ import com.styudint.nepyatnashki.data.GameInfo;
 import com.styudint.nepyatnashki.data.GameStartStateGenerator;
 import com.styudint.nepyatnashki.data.GameState;
 import com.styudint.nepyatnashki.data.GameStateListener;
+import com.styudint.nepyatnashki.data.ImageHolder;
 import com.styudint.nepyatnashki.data.repositories.StatisticsRepository;
 import com.styudint.nepyatnashki.settings.ControlMode;
 import com.styudint.nepyatnashki.settings.SettingsManager;
@@ -55,6 +55,9 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
     @Inject
     BitmapCache bitmapCache;
 
+    @Inject
+    ImageHolder imageHolder;
+
     GameState currentGameState;
 
     @Override
@@ -66,38 +69,43 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
 
         gestureDetector = new GestureDetectorCompat(this, new GestureListener());
 
-        Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.test_misha);
-        background = Bitmap.createScaledBitmap(background, background.getWidth(), background.getHeight(), false);
-        int size = Math.min(background.getWidth(), background.getHeight());
+        final AppCompatActivity thisActivity = this;
 
-        bitmapCache.initialize(background);
-        bitmapCache.setupSizeBounds(0, 0, size, size);
-
-        buttons.add((ImageButton) findViewById(R.id.button1));
-        buttons.add((ImageButton) findViewById(R.id.button2));
-        buttons.add((ImageButton) findViewById(R.id.button3));
-        buttons.add((ImageButton) findViewById(R.id.button4));
-        buttons.add((ImageButton) findViewById(R.id.button5));
-        buttons.add((ImageButton) findViewById(R.id.button6));
-        buttons.add((ImageButton) findViewById(R.id.button7));
-        buttons.add((ImageButton) findViewById(R.id.button8));
-        buttons.add((ImageButton) findViewById(R.id.button9));
-        buttons.add((ImageButton) findViewById(R.id.button10));
-        buttons.add((ImageButton) findViewById(R.id.button11));
-        buttons.add((ImageButton) findViewById(R.id.button12));
-        buttons.add((ImageButton) findViewById(R.id.button13));
-        buttons.add((ImageButton) findViewById(R.id.button14));
-        buttons.add((ImageButton) findViewById(R.id.button15));
-        buttons.add((ImageButton) findViewById(R.id.button16));
-
-        stepsCounterTextView = findViewById(R.id.stepsCounterTextView);
-        timerTextView = findViewById(R.id.timerTextView);
-
-        generator.generate().observe(this, new Observer<GameState>() {
+        imageHolder.bitmap().observe(this, new Observer<Bitmap>() {
             @Override
-            public void onChanged(GameState gameState) {
-                currentGameState = gameState;
-                startGame(gameState);
+            public void onChanged(Bitmap background) {
+                int size = Math.min(background.getWidth(), background.getHeight());
+
+                bitmapCache.initialize(background);
+                bitmapCache.setupSizeBounds(0, 0, size, size);
+
+                buttons.add((ImageButton) findViewById(R.id.button1));
+                buttons.add((ImageButton) findViewById(R.id.button2));
+                buttons.add((ImageButton) findViewById(R.id.button3));
+                buttons.add((ImageButton) findViewById(R.id.button4));
+                buttons.add((ImageButton) findViewById(R.id.button5));
+                buttons.add((ImageButton) findViewById(R.id.button6));
+                buttons.add((ImageButton) findViewById(R.id.button7));
+                buttons.add((ImageButton) findViewById(R.id.button8));
+                buttons.add((ImageButton) findViewById(R.id.button9));
+                buttons.add((ImageButton) findViewById(R.id.button10));
+                buttons.add((ImageButton) findViewById(R.id.button11));
+                buttons.add((ImageButton) findViewById(R.id.button12));
+                buttons.add((ImageButton) findViewById(R.id.button13));
+                buttons.add((ImageButton) findViewById(R.id.button14));
+                buttons.add((ImageButton) findViewById(R.id.button15));
+                buttons.add((ImageButton) findViewById(R.id.button16));
+
+                stepsCounterTextView = findViewById(R.id.stepsCounterTextView);
+                timerTextView = findViewById(R.id.timerTextView);
+
+                generator.generate().observe(thisActivity, new Observer<GameState>() {
+                    @Override
+                    public void onChanged(GameState gameState) {
+                        currentGameState = gameState;
+                        startGame(gameState);
+                    }
+                });
             }
         });
 
@@ -176,6 +184,7 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
                 false,
                 user == null ? null : user.getUid()));
         }
+        settingsManager.unsubscribe(this);
         finish();
     }
 

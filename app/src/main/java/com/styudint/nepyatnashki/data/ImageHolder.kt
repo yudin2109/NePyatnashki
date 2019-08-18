@@ -6,6 +6,10 @@ import androidx.lifecycle.LiveData
 
 interface ImageHolder {
     fun loadImage(uri : Uri)
+    fun loadResource(resId: Int)
+    fun loadFromResourceInfo(info: ResourceInfo)
+
+    fun info(): ResourceInfo?
 
     fun bitmap(): LiveData<Bitmap>
 }

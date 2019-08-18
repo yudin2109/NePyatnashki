@@ -79,7 +79,7 @@ public class MenuActivity extends AppCompatActivity {
 
 
     public void startGameActivity(View view) {
-        Intent intent = new Intent(MenuActivity.this, GameActivity.class);
+        Intent intent = new Intent(this, GalleryPage.class);
         MenuActivity.this.startActivity(intent);
     }
 
