@@ -1,8 +1,6 @@
 package com.styudint.nepyatnashki;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
@@ -186,6 +184,7 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
                 false,
                 user == null ? null : user.getUid()));
         }
+        settingsManager.unsubscribe(this);
         finish();
     }
 

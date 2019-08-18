@@ -28,7 +28,6 @@ class ImageHolderImpl constructor(private val ctx: Context) : ImageHolder {
             val columnIndex = cursor.getColumnIndex(filePathColumn[0])
             val picturePath = cursor.getString(columnIndex)
             cursor.close()
-            Log.d("curdeb", "here")
             val bitmap = BitmapFactory.decodeFile(picturePath)
             liveData.postValue(bitmap)
         }
