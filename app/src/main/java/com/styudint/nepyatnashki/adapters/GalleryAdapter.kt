@@ -32,6 +32,7 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
     }
 
     private val adapters = arrayListOf(
+        Classic15GalleryAdapter(activity),
         LandscapeGalleryAdapter(activity),
         MishaGalleryAdapter(activity)
     )
