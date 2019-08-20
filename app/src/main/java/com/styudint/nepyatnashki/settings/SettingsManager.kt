@@ -12,13 +12,18 @@ val ControlModeInfo: HashMap<ControlMode, Int> = hashMapOf(
     ControlMode.SWIPES to R.string.control_mode_swipes_string
 )
 
+private val ControlModeMapping = hashMapOf(
+    ControlMode.CLICKS to "control_mode_clicks",
+    ControlMode.SWIPES to "control_mode_swipes"
+)
+
 class ControlModeConverter {
     @TypeConverter
-    fun controlModeToInt(mode: ControlMode): Int = ControlModeInfo[mode]!!
+    fun controlModeToInt(mode: ControlMode) = ControlModeMapping[mode]!!
 
     @TypeConverter
-    fun intToControlMode(value: Int): ControlMode {
-        ControlModeInfo.forEach {
+    fun intToControlMode(value: String): ControlMode {
+        ControlModeMapping.forEach {
             if (it.value == value) {
                 return it.key
             }
