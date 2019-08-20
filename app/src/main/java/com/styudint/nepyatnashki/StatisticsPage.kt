@@ -3,6 +3,7 @@ package com.styudint.nepyatnashki
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -51,7 +52,7 @@ class StatisticsPage : FragmentActivity() {
 
         view.timestamp.text = formatTimestamp(info.timestamp)
         view.time.text = formatTime(info.time)
-        view.nMoves.text = info.nMoves.toString()
+        view.nMoves.text = info.getMoveAmount().toString()
 
         var ended = "No"
         view.ended.setTextColor(resources.getColor(R.color.red))
@@ -60,6 +61,10 @@ class StatisticsPage : FragmentActivity() {
             view.ended.setTextColor(resources.getColor(R.color.green))
         }
         view.ended.text = ended
+
+        view.setOnClickListener {
+            Toast.makeText(this, info.moveLog, Toast.LENGTH_SHORT).show()
+        }
 
         return view
     }

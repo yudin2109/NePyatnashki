@@ -1,5 +1,6 @@
 package com.styudint.nepyatnashki.data
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.GlobalScope
@@ -11,8 +12,11 @@ import kotlin.collections.ArrayList
 
 class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerator {
     companion object {
-        const val SIZE = 16
+        const val HEIGHT = 4
+        const val WIDTH = 4
         const val DEFAULT_DELAY_TIME = 16L
+
+        fun getSize(): Int = HEIGHT * WIDTH
     }
 
     private class GameStateImpl(private var permutation: ArrayList<Int>) : GameState {
@@ -21,6 +25,7 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         private val stopWatch = MutableLiveData<Long>()
 
         private var amountOfMoves = 0
+        private var moveLog = ""
         private var isGameOver = false
         private var startTime: Long = 0
         private var endTime: Long = 0
@@ -43,7 +48,7 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         }
 
         override fun handleTap(value: Int) {
-            val position = Pair(value / 4, value % 4)
+            val position = Pair(value % 4, value / 4)
             val emptyPosition = findEmpty()
             val diff = Math.abs(position.first - emptyPosition.first) + Math.abs(position.second - emptyPosition.second)
             if (diff == 1) {
@@ -105,6 +110,18 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
             val tmp = permutation[from]
             permutation[from] = permutation[to]
             permutation[to] = tmp
+
+            when (dX) {
+                -1 -> moveLog += "L"
+                1 -> moveLog += "R"
+                else -> {
+                    when (dY) {
+                        -1 -> moveLog += "U"
+                        1 -> moveLog += "D"
+                    }
+                }
+            }
+
             incrementMoves()
             notifyChanges()
         }
@@ -114,8 +131,12 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
             moves.postValue(amountOfMoves)
         }
 
+        override fun moveLog(): String {
+            return moveLog
+        }
+
         override fun isSolved(): Boolean {
-            for (i in 0 until SIZE) {
+            for (i in 0 until getSize()) {
                 if (i != permutation[i])
                     return false
             }
@@ -144,20 +165,20 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
             }
         }
 
-        private fun realValue(position: Pair<Int, Int>): Int = position.first * 4 + position.second
+        private fun realValue(position: Pair<Int, Int>): Int = position.first + position.second * 4
 
         private fun isValidPosition(position: Pair<Int, Int>): Boolean {
-            if (position.first !in 0..4) return false
-            if (position.second !in 0..4) return false
+            if (position.first !in 0 until WIDTH) return false
+            if (position.second !in 0 until HEIGHT) return false
             return true
         }
 
-        private fun findEmpty(): Pair<Int, Int> = positionByValue(SIZE - 1)
+        private fun findEmpty(): Pair<Int, Int> = positionByValue(getSize() - 1)
 
         private fun positionByValue(value: Int): Pair<Int, Int> {
-            for (i in 0 .. SIZE) {
+            for (i in 0 .. getSize()) {
                 if (permutation[i] == value) {
-                    return Pair(i / 4, i % 4)
+                    return Pair(i % 4, i / 4)
                 }
             }
             throw IllegalStateException("Cannot find empty block")
@@ -168,9 +189,9 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         val liveData = MutableLiveData<GameState>()
 
         GlobalScope.launch {
-            var permutation = generatePermutation(SIZE)
+            var permutation = generatePermutation(getSize())
             while (!isValidPermutation(permutation)) {
-                permutation = generatePermutation(SIZE)
+                permutation = generatePermutation(getSize())
             }
             liveData.postValue(GameStateImpl(permutation))
         }

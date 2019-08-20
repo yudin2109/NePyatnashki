@@ -160,7 +160,7 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
         statsRepo.saveGame(new GameInfo(
             currentGameState.startTime(),
             currentGameState.gameTime(),
-            currentGameState.amountOfMoves(),
+            currentGameState.moveLog(),
             true,
             user == null ? null : user.getUid()));
     }
@@ -180,7 +180,7 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
             statsRepo.saveGame(new GameInfo(
                 currentGameState.startTime(),
                 currentGameState.gameTime(),
-                currentGameState.amountOfMoves(),
+                currentGameState.moveLog(),
                 false,
                 user == null ? null : user.getUid()));
         }

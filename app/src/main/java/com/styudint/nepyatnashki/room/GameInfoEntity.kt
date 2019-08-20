@@ -11,7 +11,7 @@ class GameInfoEntity {
 
     var timestamp: Long = 0
     var time: Long = 0
-    var nMoves: Int = 0
+    var moveLog: String = ""
     var ended: Boolean = false
     var userUid: String? = null
 
@@ -20,7 +20,7 @@ class GameInfoEntity {
     constructor(info: GameInfo) {
         timestamp = info.timestamp
         time = info.time
-        nMoves = info.nMoves
+        moveLog = info.moveLog
         ended = info.ended
         userUid = info.userUid
     }
