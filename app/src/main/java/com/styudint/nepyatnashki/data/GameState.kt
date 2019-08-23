@@ -1,7 +1,5 @@
 package com.styudint.nepyatnashki.data
 
-import androidx.lifecycle.LiveData
-
 interface GameState {
     fun moveUp()
     fun moveDown()
@@ -13,8 +11,7 @@ interface GameState {
     // Permutation which represents game state, 15 corresponds to the empty block
     fun permutation(): List<Int>
 
-    fun stopWatch(): LiveData<Long>
-    fun moves(): LiveData<Int>
+    fun moves(): Int
 
     fun isSolved(): Boolean
 

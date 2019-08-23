@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.styudint.nepyatnashki.account.AccountManager;
+import com.styudint.nepyatnashki.data.AndroidGameState;
 import com.styudint.nepyatnashki.data.BitmapCache;
 import com.styudint.nepyatnashki.data.GameInfo;
 import com.styudint.nepyatnashki.data.GameStartStateGenerator;
@@ -58,7 +59,7 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
     @Inject
     ImageHolder imageHolder;
 
-    GameState currentGameState;
+    AndroidGameState currentGameState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,9 +100,9 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
                 stepsCounterTextView = findViewById(R.id.stepsCounterTextView);
                 timerTextView = findViewById(R.id.timerTextView);
 
-                generator.generate().observe(thisActivity, new Observer<GameState>() {
+                generator.generate().observe(thisActivity, new Observer<AndroidGameState>() {
                     @Override
-                    public void onChanged(GameState gameState) {
+                    public void onChanged(AndroidGameState gameState) {
                         currentGameState = gameState;
                         startGame(gameState);
                     }
@@ -112,15 +113,9 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
         settingsManager.subscribe(this);
     }
 
-    private void startGame(GameState gameState) {
+    private void startGame(AndroidGameState gameState) {
         gameState.start();
         gameState.subscribe(this);
-        gameState.moves().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                stepsCounterTextView.setText(integer.toString());
-            }
-        });
         gameState.stopWatch().observe(this, new Observer<Long>() {
             @Override
             public void onChanged(Long timeValue) {
@@ -136,7 +131,8 @@ public class GameActivity extends AppCompatActivity implements GameStateListener
         return String.format("%d:%02d:%02d", time / 6000, (time / 100) % 60, time % 100);
     }
 
-    private void applyGameState(GameState gameState) {
+    private void applyGameState(AndroidGameState gameState) {
+        stepsCounterTextView.setText(Integer.valueOf(gameState.moves()).toString());
         for (int i = 0; i < 16; i++) {
             int id = gameState.permutation().get(i);
             buttons.get(i).setImageBitmap(bitmapCache.getBitmapForId(id));
