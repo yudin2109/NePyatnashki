@@ -2,7 +2,7 @@ package com.styudint.nepyatnashki.data
 
 import androidx.lifecycle.LiveData
 
-interface AndroidGameState : GameState {
+interface AndroidGameState : com.styudint.nepyatnashki.common.GameState {
     fun handleTap(value: Int)
     fun stopWatch(): LiveData<Long>
 

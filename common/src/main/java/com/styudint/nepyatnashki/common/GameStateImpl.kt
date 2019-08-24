@@ -1,4 +1,4 @@
-package com.styudint.nepyatnashki.data
+package com.styudint.nepyatnashki.common
 
 import java.lang.IllegalStateException
 

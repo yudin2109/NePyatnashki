@@ -2,6 +2,7 @@ package com.styudint.nepyatnashki.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.styudint.nepyatnashki.common.GameStateImpl
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
