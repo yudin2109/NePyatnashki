@@ -12,16 +12,16 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         const val HEIGHT = 4
         const val WIDTH = 4
 
-        fun getSize(): Int = HEIGHT * WIDTH
+        const val PERMUTATION_SIZE = WIDTH * HEIGHT
     }
 
     override fun generate(): LiveData<AndroidGameState> {
         val liveData = MutableLiveData<AndroidGameState>()
 
         GlobalScope.launch {
-            var permutation = generatePermutation(getSize())
+            var permutation = generatePermutation(PERMUTATION_SIZE)
             while (!isValidPermutation(permutation)) {
-                permutation = generatePermutation(getSize())
+                permutation = generatePermutation(PERMUTATION_SIZE)
             }
             liveData.postValue(AndroidGameStateImpl(permutation, WIDTH, HEIGHT))
         }

@@ -6,8 +6,6 @@ interface GameState {
     fun moveRight()
     fun moveLeft()
 
-    fun handleTap(value: Int)
-
     // Permutation which represents game state, 15 corresponds to the empty block
     fun permutation(): List<Int>
 
@@ -15,15 +13,6 @@ interface GameState {
 
     fun isSolved(): Boolean
 
-    fun startTime(): Long
-    fun gameTime(): Long
-
     fun moveLog(): String
     fun amountOfMoves(): Int
-
-    fun start()
-    fun stop()
-
-    fun subscribe(listener: GameStateListener)
-    fun unsubscribe(listener: GameStateListener)
 }

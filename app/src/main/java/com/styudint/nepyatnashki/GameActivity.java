@@ -20,8 +20,7 @@ import com.styudint.nepyatnashki.data.AndroidGameState;
 import com.styudint.nepyatnashki.data.BitmapCache;
 import com.styudint.nepyatnashki.data.GameInfo;
 import com.styudint.nepyatnashki.data.GameStartStateGenerator;
-import com.styudint.nepyatnashki.data.GameState;
-import com.styudint.nepyatnashki.data.GameStateListener;
+import com.styudint.nepyatnashki.data.AndroidGameStateListener;
 import com.styudint.nepyatnashki.data.ImageHolder;
 import com.styudint.nepyatnashki.data.repositories.StatisticsRepository;
 import com.styudint.nepyatnashki.settings.ControlMode;
@@ -32,7 +31,7 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 
-public class GameActivity extends AppCompatActivity implements GameStateListener, SettingsManagerListener {
+public class GameActivity extends AppCompatActivity implements AndroidGameStateListener, SettingsManagerListener {
     static float swipeThreshold = 120f;
 
     TextView stepsCounterTextView;
