@@ -1,6 +1,6 @@
 package com.styudint.nepyatnashki.data
 
-interface GameStateListener {
+interface AndroidGameStateListener {
     fun gameStateChanged()
     fun solved()
 }
