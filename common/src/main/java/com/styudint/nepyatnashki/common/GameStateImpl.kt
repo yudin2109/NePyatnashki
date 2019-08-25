@@ -66,6 +66,8 @@ open class GameStateImpl(
         permutation[from] = permutation[to]
         permutation[to] = tmp
 
+        amountOfMoves += 1
+
         when (dY) {
             -1 -> moveLog += "L"
             1 -> moveLog += "R"
