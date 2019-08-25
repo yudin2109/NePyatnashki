@@ -1,5 +1,6 @@
 package com.styudint.nepyatnashki.common
 
+import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 
 open class GameStateImpl(
@@ -7,26 +8,50 @@ open class GameStateImpl(
     private val width: Int,
     private val height: Int
 ) : GameState {
+    init {
+        if (permutation.size != width * height)
+            throw IllegalArgumentException("size should be equal to multiplication width on height")
+    }
+
     private var moveLog = ""
     private var amountOfMoves = 0
 
-    override fun moveUp() {
+    override fun moveUp(): GameState {
         move(-1, 0)
+        return this
     }
 
-    override fun moveRight() {
+    override fun moveRight(): GameState {
         move(0, 1)
+        return this
     }
 
-    override fun moveLeft() {
+    override fun moveLeft(): GameState {
         move(0, -1)
+        return this
     }
 
-    override fun moveDown() {
+    override fun moveDown(): GameState {
         move(1, 0)
+        return this
     }
+
+    override fun height(): Int = height
+    override fun width(): Int = width
+
+    override fun canMoveUp() = canMove(-1, 0)
+    override fun canMoveRight() = canMove(0, 1)
+    override fun canMoveLeft() = canMove(0, -1)
+    override fun canMoveDown() = canMove(1, 0)
 
     override fun permutation(): List<Int> = permutation
+
+    override fun clone(): GameState = GameStateImpl(ArrayList(permutation), width, height)
+
+    protected open fun canMove(dX: Int, dY: Int): Boolean {
+        val position = findEmpty()
+        return isValidPosition(Pair(position.first - dX, position.second - dY))
+    }
 
     protected open fun move(dX: Int, dY: Int) {
         val position = findEmpty()

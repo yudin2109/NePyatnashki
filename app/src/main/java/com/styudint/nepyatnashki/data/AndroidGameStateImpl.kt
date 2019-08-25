@@ -38,24 +38,28 @@ class AndroidGameStateImpl(
         notifyChanges()
     }
 
-    override fun moveDown() {
+    override fun moveDown(): AndroidGameState {
         super.moveDown()
         notifyChanges()
+        return this
     }
 
-    override fun moveLeft() {
+    override fun moveLeft(): AndroidGameState {
         super.moveLeft()
         notifyChanges()
+        return this
     }
 
-    override fun moveRight() {
+    override fun moveRight(): AndroidGameState {
         super.moveRight()
         notifyChanges()
+        return this
     }
 
-    override fun moveUp() {
+    override fun moveUp(): AndroidGameState {
         super.moveUp()
         notifyChanges()
+        return this
     }
 
     override fun subscribe(listener: AndroidGameStateListener) {
