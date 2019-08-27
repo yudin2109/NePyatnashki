@@ -53,7 +53,7 @@ open class GameStateImpl(
         return isValidPosition(Pair(position.first - dX, position.second - dY))
     }
 
-    protected open fun move(dX: Int, dY: Int) {
+    protected fun move(dX: Int, dY: Int) {
         val position = findEmpty()
         val swpPosition = Pair(position.first - dX, position.second - dY)
         if (!isValidPosition(swpPosition)) {

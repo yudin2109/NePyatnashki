@@ -102,6 +102,10 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
                 generator.generate().observe(thisActivity, new Observer<AndroidGameState>() {
                     @Override
                     public void onChanged(AndroidGameState gameState) {
+                        if (gameState == null)
+                            return;
+                        if (currentGameState != null)
+                            throw new IllegalStateException("Game state has been already initialized");
                         currentGameState = gameState;
                         startGame(gameState);
                     }
