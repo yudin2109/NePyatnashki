@@ -10,13 +10,28 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            if (System.env.SIGN_APP != null) {
+                storeFile file(System.env.RELEASE_SIGNING_KEY_FILE)
+                storePassword System.env.RELEASE_SIGN_PASSWORD
+                keyAlias System.env.RELEASE_SIGN_KEY_ALIAS
+                keyPassword System.env.RELEASE_SIGN_KEY_PASSWORD
+            }
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (System.env.SIGN_APP != null) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
@@ -56,8 +71,26 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.0.1'
     implementation 'com.google.firebase:firebase-auth:18.1.0'
 }
+
 repositories {
     mavenCentral()
 }
 
 apply plugin: 'com.google.gms.google-services'
+
+task googleServicesJsonResolver {
+    def googleServicesJsonFile = 'app/google-services.json'
+    def jsonFile = new File(googleServicesJsonFile)
+    if (jsonFile.exists()) {
+        println("google-services.json file is FOUND")
+    } else {
+        println("google-services.json file is NOT FOUND")
+        if (System.env.GOOGLE_SERVICES_JSON_FILE_PATH == null)
+            throw IllegalStateException("GOOGLE_SERVICES_JSON_FILE_PATH is not set cannot proceed copy task")
+        copy {
+            from System.env.GOOGLE_SERVICES_JSON_FILE_PATH
+            into './'
+        }
+        println("LOADED")
+    }
+}
