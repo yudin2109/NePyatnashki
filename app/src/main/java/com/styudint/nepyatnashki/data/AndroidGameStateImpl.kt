@@ -30,12 +30,8 @@ class AndroidGameStateImpl(
         val diff = Math.abs(position.first - emptyPosition.first) + Math.abs(position.second - emptyPosition.second)
         if (diff == 1) {
             move(emptyPosition.first - position.first, emptyPosition.second - position.second)
+            notifyChanges()
         }
-    }
-
-    override fun move(dX: Int, dY: Int) {
-        super.move(dX, dY)
-        notifyChanges()
     }
 
     override fun moveDown(): AndroidGameState {

@@ -8,7 +8,7 @@ import javax.inject.Inject
 class SettingsManagerImpl @Inject constructor(
     private val appDatabase: AppDatabase
 ) : SettingsManager {
-    private val listeners = ArrayList<SettingsManagerListener>()
+    private val listeners = HashSet<SettingsManagerListener>()
 
     private var settings = Settings()
 
