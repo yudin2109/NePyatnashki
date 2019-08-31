@@ -1,6 +1,5 @@
 package com.styudint.nepyatnashki.adapters
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,8 @@ import com.styudint.nepyatnashki.data.ImageHolder
 import com.styudint.nepyatnashki.data.ResourceInfo
 import kotlinx.android.synthetic.main.gallery_image.view.*
 import kotlinx.android.synthetic.main.gallery_page_header.view.*
-import kotlinx.android.synthetic.main.gallery_page_item.view.*
+import kotlinx.android.synthetic.main.basic_gallery_page_item.view.*
+import kotlinx.android.synthetic.main.horizontal_scrollable_gallery_adapter.view.*
 import javax.inject.Inject
 
 class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -30,7 +30,10 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
 
     companion object {
         const val HEADER = 0
-        const val GALLERY_ITEM = 1
+        const val BASIC_GALLERY_ITEM = 1
+        const val SCROLLABLE_GALLERY_ITEM = 2
+
+        const val DEFAULT_IMAGE_IN_ROW_COUNT = 4
     }
 
     private val adapters = arrayListOf(
@@ -44,7 +47,9 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if (viewType == HEADER)
             return createHeader(parent)
-        return createGalleryItem(parent)
+        if (viewType == BASIC_GALLERY_ITEM)
+            return createBasicGalleryItem(parent)
+        return createHorizontalScrollableGalleryItem(parent)
     }
 
     override fun getItemCount(): Int {
@@ -58,7 +63,7 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
                 activity.finish()
             }
         }
-        if (holder.itemViewType == GALLERY_ITEM) {
+        if (holder.itemViewType == BASIC_GALLERY_ITEM || holder.itemViewType == SCROLLABLE_GALLERY_ITEM) {
             holder as GalleryItem
             holder.bind(adapters[position - 1], LayoutInflater.from(activity))
         }
@@ -78,17 +83,35 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
     override fun getItemViewType(position: Int): Int {
         if (position == 0)
             return HEADER
-        return GALLERY_ITEM
+        if (position == 2)
+            return SCROLLABLE_GALLERY_ITEM
+        return BASIC_GALLERY_ITEM
     }
 
-    private fun createGalleryItem(parent: ViewGroup): BasicGalleryItem {
-        val view = LayoutInflater.from(activity).inflate(R.layout.gallery_page_item, parent, false)
+    private fun createBasicGalleryItem(parent: ViewGroup): BasicGalleryItem {
+        val view = LayoutInflater.from(activity).inflate(R.layout.basic_gallery_page_item, parent, false)
         return BasicGalleryItem(view)
+    }
+
+    private fun createHorizontalScrollableGalleryItem(parent: ViewGroup) : HorizontalScrollableGalleryItem {
+        val view = LayoutInflater.from(activity).inflate(R.layout.horizontal_scrollable_gallery_adapter, parent, false)
+        return HorizontalScrollableGalleryItem(view)
     }
 
     private fun createHeader(parent: ViewGroup): HeaderViewHolder {
         val view = LayoutInflater.from(activity).inflate(R.layout.gallery_page_header, parent, false)
         return HeaderViewHolder(view)
+    }
+
+    private fun registerImage(anchorView: View, info: ResourceInfo) {
+        if (info == imageHolder.info()) {
+            anchorView.findViewById<ImageView>(R.id.overlay).visibility = View.VISIBLE
+            picked = anchorView
+        }
+
+        anchorView.setOnClickListener {
+            picked(anchorView, info)
+        }
     }
 
     interface GalleryItem {
@@ -104,7 +127,8 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
             miniGallery.removeAllViews()
 
             val rows = ArrayList<LinearLayout>()
-            val amountOfRows = (adapter.amountOfImages() + 3) / 4
+            val amountOfRows =
+                (adapter.amountOfImages() + DEFAULT_IMAGE_IN_ROW_COUNT - 1) / DEFAULT_IMAGE_IN_ROW_COUNT
 
             for (i in 0 until(amountOfRows)) {
                 val linearLayout = inflater.inflate(
@@ -115,23 +139,49 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
             }
 
             for (i in 0 until(adapter.amountOfImages())) {
-                val view = inflater.inflate(R.layout.gallery_image, rows[i / 4], false)
+                val view = inflater.inflate(
+                    R.layout.gallery_image,
+                    rows[i / DEFAULT_IMAGE_IN_ROW_COUNT],
+                    false)
                 adapter.getBitmap(i).observe(activity, Observer {
                     view.image.setImageBitmap(it)
                 })
-                view.setOnClickListener {
-                    picked(view, adapter.getResourceInfo(i))
-                }
-                if (adapter.getResourceInfo(i) == imageHolder.info()) {
-                    view.findViewById<ImageView>(R.id.overlay).visibility = View.VISIBLE
-                    picked = view
-                }
-                rows[i / 4].addView(view)
+                registerImage(view, adapter.getResourceInfo(i))
+                rows[i / DEFAULT_IMAGE_IN_ROW_COUNT].addView(view)
             }
 
             rows.forEach {
                 miniGallery.addView(it)
             }
+        }
+    }
+
+    inner class HorizontalScrollableGalleryItem(view: View) : RecyclerView.ViewHolder(view), GalleryItem {
+        private val header: TextView = view.header
+        private val imagesAnchor: LinearLayout = view.imagesAnchor
+
+        override fun bind(adapter: GalleryImageAdapter, inflater: LayoutInflater) {
+            header.text = adapter.getName()
+            imagesAnchor.removeAllViews()
+            for (i in 0 until adapter.amountOfImages()) {
+                val imageFrame = inflater.inflate(R.layout.gallery_image, imagesAnchor, false)
+                adapter.getBitmap(i).observe(activity, Observer {
+                    if (it == null)
+                        return@Observer
+                    prepareViewLayout(imageFrame)
+                    imageFrame.image.setImageBitmap(it)
+                })
+                registerImage(imageFrame, adapter.getResourceInfo(i))
+                imagesAnchor.addView(imageFrame)
+            }
+        }
+
+        private fun prepareViewLayout(view: View) {
+            val params = LinearLayout.LayoutParams(
+                header.width / (DEFAULT_IMAGE_IN_ROW_COUNT),
+                header.width / (DEFAULT_IMAGE_IN_ROW_COUNT),
+                1.0f)
+            view.layoutParams = params
         }
     }
 
