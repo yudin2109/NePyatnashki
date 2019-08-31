@@ -9,7 +9,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
-import android.util.Log
 import com.styudint.nepyatnashki.R
 
 
@@ -18,7 +17,7 @@ class ImageHolderImpl constructor(private val ctx: Context) : ImageHolder {
     private var currentInfo: ResourceInfo? = null
 
     init {
-        loadResource(R.drawable.test_misha)
+        loadResource(R.drawable.test_misha_0)
     }
 
     override fun loadImage(uri: Uri) {

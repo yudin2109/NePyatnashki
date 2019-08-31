@@ -3,6 +3,7 @@ package com.styudint.nepyatnashki.adapters
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.styudint.nepyatnashki.R
@@ -11,18 +12,39 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MishaGalleryAdapter(private val ctx: Context) : GalleryImageAdapter {
-    override fun amountOfImages() = 1
+    private val resources = arrayOf(
+            R.drawable.test_misha_0,
+            R.drawable.test_misha_1,
+            R.drawable.test_misha_2,
+            R.drawable.test_misha_3,
+            R.drawable.test_misha_4,
+            R.drawable.test_misha_5,
+            R.drawable.test_misha_6,
+            R.drawable.test_misha_7
+    )
+
+    private val cache = SparseArray<LiveData<Bitmap>>()
+
+    override fun amountOfImages(): Int = resources.size
 
     override fun getBitmap(index: Int): LiveData<Bitmap> {
+        if (cache.get(index) != null)
+            return cache.get(index)
+
         val liveData = MutableLiveData<Bitmap>()
+
         GlobalScope.launch {
-            liveData.postValue(BitmapFactory.decodeResource(ctx.resources, R.drawable.test_misha))
+            val options = BitmapFactory.Options()
+            options.inSampleSize = 2 // Quick hack should be rewritten to create nice image
+            liveData.postValue(BitmapFactory.decodeResource(ctx.resources, resources[index], options))
         }
-        return liveData
+
+        cache.put(index, liveData)
+        return cache[index]
     }
 
     override fun getResourceInfo(index: Int): ResourceInfo {
-        return ResourceInfo.fromResource(R.drawable.test_misha)
+        return ResourceInfo.fromResource(resources[index])
     }
 
     override fun getName(): String = "Misha"
