@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MenuActivity">
-
+    tools:context=".MenuActivity"
+>
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -47,30 +47,33 @@
 
     <Button
         android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:text="Play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/play_string"
         app:layout_constraintBottom_toTopOf="@id/statisticsButton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.2"
-        android:background="#FF0c5705"
-        android:textSize="55sp"
-        android:textColor="#FFffff52"
+        android:textSize="34sp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/play_button_background"
         app:layout_constraintRight_toRightOf="parent"
-        android:onClick="startGameActivity"/>
+        android:onClick="startGameActivity"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="60dp"
+        android:paddingEnd="60dp"
+        android:layout_marginBottom="8dp"
+    />
 
     <Button
         android:id="@+id/statisticsButton"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:onClick="onStatsClicked"
-        android:text="@string/watch_your_stats_string"
-        android:textColor="@color/colorAccent"
+        android:text="@string/statistics_string"
+        android:textColor="@color/darkBlack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/settingsButton"
@@ -81,14 +84,12 @@
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:onClick="onSettingsClicked"
         android:text="@string/settings_string"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/darkBlack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="24dp"
     />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
