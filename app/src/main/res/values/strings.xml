@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">NePyatnashki</string>
     <string name="statistics_string">Statistics</string>
-    <string name="our_main_string">СОБЕРИ ЕБАЛО МИШЕ</string>
+    <string name="our_main_string">СОБЕРИ\nЕБАЛО\nМИШЕ</string>
     <string name="settings_string">Settings</string>
     <string name="control_mode_string">Control mode</string>
     <string name="control_mode_clicks_string">Control by clicks</string>
