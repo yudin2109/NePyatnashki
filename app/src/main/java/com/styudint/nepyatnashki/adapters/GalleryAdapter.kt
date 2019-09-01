@@ -29,6 +29,7 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
     }
 
     companion object {
+        const val EMPTY_ITEM = -1
         const val HEADER = 0
         const val BASIC_GALLERY_ITEM = 1
         const val SCROLLABLE_GALLERY_ITEM = 2
@@ -37,9 +38,9 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
     }
 
     private val adapters = arrayListOf(
+        MishaGalleryAdapter(activity),
         Classic15GalleryAdapter(activity),
-        LandscapeGalleryAdapter(activity),
-        MishaGalleryAdapter(activity)
+        LandscapeGalleryAdapter(activity)
     )
 
     private var picked: View? = null
@@ -49,11 +50,13 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
             return createHeader(parent)
         if (viewType == BASIC_GALLERY_ITEM)
             return createBasicGalleryItem(parent)
+        if (viewType == EMPTY_ITEM)
+            return createEmptyItem(parent)
         return createHorizontalScrollableGalleryItem(parent)
     }
 
     override fun getItemCount(): Int {
-        return 1 + adapters.size
+        return 2 + adapters.size
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -85,7 +88,14 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
             return HEADER
         if (position == 2)
             return SCROLLABLE_GALLERY_ITEM
+        if (position == adapters.size + 1)
+            return EMPTY_ITEM
         return BASIC_GALLERY_ITEM
+    }
+
+    private fun createEmptyItem(parent: ViewGroup): RecyclerView.ViewHolder {
+        val view = LayoutInflater.from(activity).inflate(R.layout.empty_gallery_item, parent, false)
+        return object : RecyclerView.ViewHolder(view) {}
     }
 
     private fun createBasicGalleryItem(parent: ViewGroup): BasicGalleryItem {
