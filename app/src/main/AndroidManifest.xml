@@ -12,18 +12,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".MenuActivity">
+        <activity android:name=".MenuActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GameActivity" />
-        <activity android:name=".StatisticsPage" />
-        <activity android:name=".SettingsPage" />
-        <activity android:name=".SignInPage" />
-        <activity android:name=".GalleryPage" />
+        <activity android:name=".GameActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".StatisticsPage"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SettingsPage"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SignInPage"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".GalleryPage"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
