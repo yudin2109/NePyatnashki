@@ -176,12 +176,12 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
         currentGameState.stop();
         FirebaseUser user = accountManager.currentUser();
         if (!currentGameState.isSolved()) {
-            statsRepo.saveGame(new GameInfo(
+            /*statsRepo.saveGame(new GameInfo(
                 currentGameState.startTime(),
                 currentGameState.gameTime(),
                 currentGameState.moveLog(),
                 false,
-                user == null ? null : user.getUid()));
+                user == null ? null : user.getUid()));*/
         }
         settingsManager.unsubscribe(this);
         finish();

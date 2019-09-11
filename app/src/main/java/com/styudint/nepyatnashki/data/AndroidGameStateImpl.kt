@@ -19,7 +19,6 @@ class AndroidGameStateImpl(
     private val listeners = ArrayList<AndroidGameStateListener>()
     private val stopWatch = MutableLiveData<Long>()
 
-    private var isGameOver = false
     private var startTime: Long = 0
     private var endTime: Long = 0
     private var gameTime: Long = 0
@@ -94,12 +93,14 @@ class AndroidGameStateImpl(
     override fun stopWatch(): LiveData<Long> = stopWatch
 
     private fun notifyChanges() {
-        if (isSolved()) {
-            notifyGameStateChanged()
-            stop()
-            notifySolved()
-        } else {
-            notifyGameStateChanged()
+        if (!isGameOver) {
+            if (isSolved()) {
+                notifyGameStateChanged()
+                stop()
+                notifySolved()
+            } else {
+                notifyGameStateChanged()
+            }
         }
     }
 

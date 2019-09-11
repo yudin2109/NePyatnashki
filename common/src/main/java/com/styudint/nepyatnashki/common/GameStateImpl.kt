@@ -13,6 +13,7 @@ open class GameStateImpl(
             throw IllegalArgumentException("size should be equal to multiplication width on height")
     }
 
+    protected var isGameOver = false
     private var moveLog = ""
     private var amountOfMoves = 0
 
@@ -54,6 +55,9 @@ open class GameStateImpl(
     }
 
     protected fun move(dX: Int, dY: Int) {
+        if (isGameOver)
+            return
+
         val position = findEmpty()
         val swpPosition = Pair(position.first - dX, position.second - dY)
         if (!isValidPosition(swpPosition)) {

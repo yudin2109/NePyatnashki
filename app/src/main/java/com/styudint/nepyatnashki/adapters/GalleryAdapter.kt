@@ -38,8 +38,8 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
     }
 
     private val adapters = arrayListOf(
-        MishaGalleryAdapter(activity),
         Classic15GalleryAdapter(activity),
+            MishaGalleryAdapter(activity),
         LandscapeGalleryAdapter(activity)
     )
 
@@ -86,7 +86,7 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
     override fun getItemViewType(position: Int): Int {
         if (position == 0)
             return HEADER
-        if (position == 2)
+        if (position == 3)
             return SCROLLABLE_GALLERY_ITEM
         if (position == adapters.size + 1)
             return EMPTY_ITEM
