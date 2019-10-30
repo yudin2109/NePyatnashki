@@ -53,6 +53,10 @@ class BitmapCacheImpl @Inject constructor() : BitmapCache {
             throw IllegalStateException("Image should be square")
     }
 
+    override fun isInitialized(): Boolean {
+        return bitmap != null
+    }
+
     private fun invalidateCache() {
         cache.clear()
     }

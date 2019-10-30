@@ -29,161 +29,18 @@
         android:textColor="#FF000000"
         android:textSize="35dp"/>
 
-    <TableLayout
+    <com.styudint.nepyatnashki.gameviews.GameView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:id="@+id/gameView"
         android:layout_marginTop="60dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintTop_toBottomOf="@id/stepsCounterTextView"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp">
-
-        <TableRow
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:gravity="center_horizontal">
-
-            <ImageButton
-                android:id="@+id/button1"
-                android:layout_column="0"
-                android:tag="0"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button2"
-                android:layout_column="1"
-                android:tag="1"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark"/>
-
-            <ImageButton
-                android:id="@+id/button3"
-                android:layout_column="2"
-                android:tag="2"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark"/>
-
-            <ImageButton
-                android:id="@+id/button4"
-                android:layout_column="3"
-                android:tag="3"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark"/>
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:gravity="center_horizontal">
-
-            <ImageButton
-                android:id="@+id/button5"
-                android:layout_column="0"
-                android:tag="4"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button6"
-                android:layout_column="1"
-                android:tag="5"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button7"
-                android:layout_column="2"
-                android:tag="6"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button8"
-                android:layout_column="3"
-                android:tag="7"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:gravity="center_horizontal">
-
-            <ImageButton
-                android:id="@+id/button9"
-                android:layout_column="0"
-                android:tag="8"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button10"
-                android:layout_column="1"
-                android:tag="9"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button11"
-                android:layout_column="2"
-                android:tag="10"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button12"
-                android:layout_column="3"
-                android:tag="11"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:padding="0dp"
-            android:gravity="center_horizontal">
-
-            <ImageButton
-                android:id="@+id/button13"
-                android:layout_column="0"
-                android:tag="12"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button14"
-                android:layout_column="1"
-                android:tag="13"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button15"
-                android:layout_column="2"
-                android:tag="14"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-
-            <ImageButton
-                android:id="@+id/button16"
-                android:layout_column="3"
-                android:tag="15"
-                style="@style/BarleyBreakButton"
-                app:srcCompat="@android:color/background_dark" />
-        </TableRow>
-    </TableLayout>
+        app:layout_constraintRight_toRightOf="parent">
+    </com.styudint.nepyatnashki.gameviews.GameView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

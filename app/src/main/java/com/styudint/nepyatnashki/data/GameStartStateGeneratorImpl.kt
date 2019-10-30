@@ -15,6 +15,8 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
         const val PERMUTATION_SIZE = WIDTH * HEIGHT
     }
 
+    override var gameState: AndroidGameState? = null
+
     override fun generate(): LiveData<AndroidGameState> {
         val liveData = MutableLiveData<AndroidGameState>()
 
@@ -23,7 +25,9 @@ class GameStartStateGeneratorImpl @Inject constructor() : GameStartStateGenerato
             while (!isValidPermutation(permutation)) {
                 permutation = generatePermutation(PERMUTATION_SIZE)
             }
-            liveData.postValue(AndroidGameStateImpl(permutation, WIDTH, HEIGHT))
+            gameState = AndroidGameStateImpl(permutation, WIDTH, HEIGHT).also {
+                liveData.postValue(it)
+            }
         }
 
         return liveData

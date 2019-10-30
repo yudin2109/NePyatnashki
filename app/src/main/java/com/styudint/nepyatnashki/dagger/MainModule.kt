@@ -43,6 +43,7 @@ class MainModule(private var context: Context) {
     fun providesAccountManager(impl: AccountManagerImpl): AccountManager = impl
 
     @Provides
+    @Singleton
     fun providesBitmapCache(impl: BitmapCacheImpl): BitmapCache = impl
 
     @Provides
