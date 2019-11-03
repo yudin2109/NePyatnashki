@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.styudint.nepyatnashki.NePyatnashkiApp
 import com.styudint.nepyatnashki.R
-import com.styudint.nepyatnashki.data.ImageHolder
+import com.styudint.nepyatnashki.data.GameRequisitesHolder
 import com.styudint.nepyatnashki.data.ResourceInfo
 import kotlinx.android.synthetic.main.gallery_image.view.*
 import kotlinx.android.synthetic.main.gallery_page_header.view.*
@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     @Inject
-    lateinit var imageHolder: ImageHolder
+    lateinit var requisitesHolder: GameRequisitesHolder
 
     init {
         (activity.applicationContext as NePyatnashkiApp).appComponent.inject(this)
@@ -72,14 +72,16 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
         }
     }
 
-    private fun picked(view: View, info: ResourceInfo) {
+    private fun picked(view: View, info: ResourceInfo, sizes: Pair<Int, Int>) {
         picked?.let {
             it.findViewById<ImageView>(R.id.overlay).visibility = View.GONE
         }
         picked = view
         picked?.let {
             it.findViewById<ImageView>(R.id.overlay).visibility = View.VISIBLE
-            imageHolder.loadFromResourceInfo(info)
+            requisitesHolder.loadFromResourceInfo(info)
+            requisitesHolder.Width = sizes.first
+            requisitesHolder.Height = sizes.second
         }
     }
 
@@ -113,14 +115,14 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
         return HeaderViewHolder(view)
     }
 
-    private fun registerImage(anchorView: View, info: ResourceInfo) {
-        if (info == imageHolder.info()) {
+    private fun registerImage(anchorView: View, info: ResourceInfo, sizes: Pair<Int, Int>) {
+        if (info == requisitesHolder.info()) {
             anchorView.findViewById<ImageView>(R.id.overlay).visibility = View.VISIBLE
             picked = anchorView
         }
 
         anchorView.setOnClickListener {
-            picked(anchorView, info)
+            picked(anchorView, info, sizes)
         }
     }
 
@@ -156,7 +158,7 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
                 adapter.getBitmap(i).observe(activity, Observer {
                     view.image.setImageBitmap(it)
                 })
-                registerImage(view, adapter.getResourceInfo(i))
+                registerImage(view, adapter.getResourceInfo(i), adapter.getSizes(i))
                 rows[i / DEFAULT_IMAGE_IN_ROW_COUNT].addView(view)
             }
 
@@ -181,7 +183,7 @@ class GalleryAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
                     prepareViewLayout(imageFrame)
                     imageFrame.image.setImageBitmap(it)
                 })
-                registerImage(imageFrame, adapter.getResourceInfo(i))
+                registerImage(imageFrame, adapter.getResourceInfo(i), adapter.getSizes(i))
                 imagesAnchor.addView(imageFrame)
             }
         }

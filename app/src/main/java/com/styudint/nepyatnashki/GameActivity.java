@@ -19,10 +19,12 @@ import com.styudint.nepyatnashki.account.AccountManager;
 import com.styudint.nepyatnashki.data.AndroidGameState;
 import com.styudint.nepyatnashki.data.BitmapCache;
 import com.styudint.nepyatnashki.data.GameInfo;
+import com.styudint.nepyatnashki.data.GameRequisitesHolder;
 import com.styudint.nepyatnashki.data.GameStartStateGenerator;
 import com.styudint.nepyatnashki.data.AndroidGameStateListener;
-import com.styudint.nepyatnashki.data.ImageHolder;
+import com.styudint.nepyatnashki.data.GameStartStateGeneratorImpl;
 import com.styudint.nepyatnashki.data.repositories.StatisticsRepository;
+import com.styudint.nepyatnashki.gameviews.GameView;
 import com.styudint.nepyatnashki.settings.ControlMode;
 import com.styudint.nepyatnashki.settings.SettingsManager;
 import com.styudint.nepyatnashki.settings.SettingsManagerListener;
@@ -30,13 +32,16 @@ import com.styudint.nepyatnashki.settings.SettingsManagerListener;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import kotlin.Pair;
 
 public class GameActivity extends AppCompatActivity implements AndroidGameStateListener, SettingsManagerListener {
     static float swipeThreshold = 120f;
 
     TextView stepsCounterTextView;
     TextView timerTextView;
-    ArrayList<ImageButton> buttons = new ArrayList<>();
+    GameView gameView;
 
     GestureDetectorCompat gestureDetector;
 
@@ -56,7 +61,7 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
     BitmapCache bitmapCache;
 
     @Inject
-    ImageHolder imageHolder;
+    GameRequisitesHolder requisitesHolder;
 
     AndroidGameState currentGameState;
 
@@ -71,34 +76,21 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
 
         final AppCompatActivity thisActivity = this;
 
-        imageHolder.bitmap().observe(this, new Observer<Bitmap>() {
+        requisitesHolder.bitmap().observe(this, new Observer<Bitmap>() {
             @Override
             public void onChanged(Bitmap background) {
                 int size = Math.min(background.getWidth(), background.getHeight());
 
                 bitmapCache.initialize(background);
+                bitmapCache.setupSizes(requisitesHolder.getWidth(), requisitesHolder.getHeight());
                 bitmapCache.setupSizeBounds(0, 0, size, size);
 
-                buttons.add((ImageButton) findViewById(R.id.button1));
-                buttons.add((ImageButton) findViewById(R.id.button2));
-                buttons.add((ImageButton) findViewById(R.id.button3));
-                buttons.add((ImageButton) findViewById(R.id.button4));
-                buttons.add((ImageButton) findViewById(R.id.button5));
-                buttons.add((ImageButton) findViewById(R.id.button6));
-                buttons.add((ImageButton) findViewById(R.id.button7));
-                buttons.add((ImageButton) findViewById(R.id.button8));
-                buttons.add((ImageButton) findViewById(R.id.button9));
-                buttons.add((ImageButton) findViewById(R.id.button10));
-                buttons.add((ImageButton) findViewById(R.id.button11));
-                buttons.add((ImageButton) findViewById(R.id.button12));
-                buttons.add((ImageButton) findViewById(R.id.button13));
-                buttons.add((ImageButton) findViewById(R.id.button14));
-                buttons.add((ImageButton) findViewById(R.id.button15));
-                buttons.add((ImageButton) findViewById(R.id.button16));
 
                 stepsCounterTextView = findViewById(R.id.stepsCounterTextView);
                 timerTextView = findViewById(R.id.timerTextView);
+                gameView = findViewById(R.id.gameView);
 
+                generator.changeSizes(requisitesHolder.getWidth(), requisitesHolder.getHeight());
                 generator.generate().observe(thisActivity, new Observer<AndroidGameState>() {
                     @Override
                     public void onChanged(AndroidGameState gameState) {
@@ -107,6 +99,7 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
                         if (currentGameState != null)
                             throw new IllegalStateException("Game state has been already initialized");
                         currentGameState = gameState;
+
                         startGame(gameState);
                     }
                 });
@@ -136,15 +129,6 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
 
     private void applyGameState(AndroidGameState gameState) {
         stepsCounterTextView.setText(Integer.valueOf(gameState.moves()).toString());
-        for (int i = 0; i < 16; i++) {
-            int id = gameState.permutation().get(i);
-            buttons.get(i).setImageBitmap(bitmapCache.getBitmapForId(id));
-            if (id == 15) {
-                buttons.get(i).setVisibility(View.INVISIBLE);
-            } else {
-                buttons.get(i).setVisibility(View.VISIBLE);
-            }
-        }
     }
 
     @Override
@@ -196,13 +180,9 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
     @Override
     public void settingsChanged() {
         if (settingsManager.controlMode() == ControlMode.CLICKS) {
-            for (ImageButton btn : buttons) {
-                btn.setClickable(true);
-            }
+
         } else if (settingsManager.controlMode() == ControlMode.SWIPES) {
-            for (ImageButton btn : buttons) {
-                btn.setClickable(false);
-            }
+
         }
     }
 
@@ -210,6 +190,7 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
     public void onPause() {
         super.onPause();
         settingsManager.unsubscribe(this);
+        gameView.pause();
     }
 
     @Override

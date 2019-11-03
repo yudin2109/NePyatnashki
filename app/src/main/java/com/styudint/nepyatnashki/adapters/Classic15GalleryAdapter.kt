@@ -26,4 +26,8 @@ class Classic15GalleryAdapter(private val ctx: Context) : GalleryImageAdapter {
     }
 
     override fun getName(): String = "Classic"
+
+    override fun getSizes(index: Int): Pair<Int, Int> {
+        return Pair(4, 4)
+    }
 }

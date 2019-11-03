@@ -15,7 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
-import com.styudint.nepyatnashki.data.ImageHolder;
+import com.styudint.nepyatnashki.data.GameRequisitesHolder;
 
 import javax.inject.Inject;
 
@@ -24,7 +24,7 @@ public class MenuActivity extends AppCompatActivity {
     static int OPEN_IMAGE = 1;
 
     @Inject
-    ImageHolder imageHolder;
+    GameRequisitesHolder requisitesHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class MenuActivity extends AppCompatActivity {
 
         final Activity thisActivity = this;
 
-        imageHolder.bitmap().observe(this, new Observer<Bitmap>() {
+        requisitesHolder.bitmap().observe(this, new Observer<Bitmap>() {
             @Override
             public void onChanged(Bitmap bitmap) {
                 ContentLoadingProgressBar progressBar = findViewById(R.id.loadingPlaceHolder);
@@ -72,7 +72,7 @@ public class MenuActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == OPEN_IMAGE) {
             Uri uri = data.getData();
             if (uri != null) {
-                imageHolder.loadImage(uri);
+                requisitesHolder.loadImage(uri);
             }
         }
     }
