@@ -10,11 +10,14 @@ import kotlinx.coroutines.launch
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
 import com.styudint.nepyatnashki.R
+import javax.inject.Inject
 
 
-class ImageHolderImpl constructor(private val ctx: Context) : ImageHolder {
+class GameRequisitesHolderImpl constructor(private val ctx: Context) : GameRequisitesHolder {
     private val liveData = MutableLiveData<Bitmap>()
     private var currentInfo: ResourceInfo? = null
+    override var Height: Int = 4
+    override var Width: Int = 4
 
     init {
         loadResource(R.drawable.test_misha_0)

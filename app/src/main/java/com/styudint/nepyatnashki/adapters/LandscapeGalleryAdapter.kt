@@ -21,6 +21,15 @@ class LandscapeGalleryAdapter(private val ctx: Context) : GalleryImageAdapter {
         R.drawable.landscape_6
     )
 
+    private val sizeList = arrayOf(
+            Pair(3, 3),
+            Pair(3, 3),
+            Pair(4, 4),
+            Pair(4, 4),
+            Pair(5, 5),
+            Pair(5, 5)
+    )
+
     private val cache = SparseArray<LiveData<Bitmap>>()
 
     override fun amountOfImages(): Int = resources.size
@@ -43,6 +52,10 @@ class LandscapeGalleryAdapter(private val ctx: Context) : GalleryImageAdapter {
 
     override fun getResourceInfo(index: Int): ResourceInfo {
         return ResourceInfo.fromResource(resources[index])
+    }
+
+    override fun getSizes(index: Int): Pair<Int, Int> {
+        return sizeList[index]
     }
 
     override fun getName(): String = "Landscapes"

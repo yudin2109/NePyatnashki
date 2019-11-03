@@ -3,18 +3,13 @@ package com.styudint.nepyatnashki.gameviews
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log.i
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import androidx.lifecycle.Observer
-import com.styudint.nepyatnashki.R
-import com.styudint.nepyatnashki.data.AndroidGameState
-import com.styudint.nepyatnashki.data.BitmapCache
-import com.styudint.nepyatnashki.data.ImageHolder
-import javax.inject.Inject
 
 class GameView(private val mContext: Context, attrs: AttributeSet? = null) :
-        SurfaceView(mContext, attrs) {
+        SurfaceView(mContext, attrs), SurfaceHolder.Callback {
 
     private var mGameThread: GameDrawingThread? = null
 
@@ -22,6 +17,10 @@ class GameView(private val mContext: Context, attrs: AttributeSet? = null) :
     private var mViewHeight: Int = 0
 
     private val mSurfaceHolder: SurfaceHolder = holder
+
+    init {
+        mSurfaceHolder.addCallback(this)
+    }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
@@ -31,11 +30,6 @@ class GameView(private val mContext: Context, attrs: AttributeSet? = null) :
 
     fun pause() {
         mGameThread!!.setRunning(false)
-        try {
-            mGameThread!!.join()
-        } catch (e: InterruptedException) {
-            print(e.stackTrace)
-        }
     }
 
     fun resume() {
@@ -64,7 +58,25 @@ class GameView(private val mContext: Context, attrs: AttributeSet? = null) :
         return true
     }
 
-    fun restart() {
+    override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
 
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder?) {
+        resume()
+    }
+
+    override fun surfaceDestroyed(holder: SurfaceHolder?) {
+        i("log", "PAUSE|PAUSE|PAUSE|PAUSE|PAUSE|PAUSE")
+        pause()
+        var retry: Boolean = true
+        while (retry) {
+            try {
+                mGameThread!!.join()
+                retry = false
+            } catch (e: InterruptedException) {
+                print(e.stackTrace)
+            }
+        }
     }
 }

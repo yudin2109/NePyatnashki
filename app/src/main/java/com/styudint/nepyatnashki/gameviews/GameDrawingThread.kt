@@ -5,6 +5,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
+import android.util.Log.i
 import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.animation.LinearInterpolator
@@ -21,10 +22,11 @@ import kotlin.collections.ArrayList
 class GameDrawingThread(surfaceHolder: SurfaceHolder, context: Context) :
         Thread() {
     private var myThreadSurfaceHolder: SurfaceHolder = surfaceHolder
+    @Volatile
     private var myThreadRun: Boolean = false
 
-    public val height = 4
-    public val width = 4
+    public var height = 4
+    public var width = 4
 
     @Inject
     lateinit var cache: BitmapCache
@@ -36,7 +38,10 @@ class GameDrawingThread(surfaceHolder: SurfaceHolder, context: Context) :
     private var isBusy = false
 
     init {
+        i("log", "thred created")
         (context.applicationContext as NePyatnashkiApp).appComponent.inject(this)
+        height = cache.height
+        width = cache.width
     }
 
     fun setRunning(b: Boolean) {
@@ -67,8 +72,10 @@ class GameDrawingThread(surfaceHolder: SurfaceHolder, context: Context) :
     @Override
     override fun run() {
         super.run()
+        //i("log", "run")
 
         while (myThreadRun) {
+            //i("log", "start")
             if (!cache.isInitialized())
                 continue
             if (gameState == null) {
@@ -77,11 +84,13 @@ class GameDrawingThread(surfaceHolder: SurfaceHolder, context: Context) :
                 else
                     gameState = generator.gameState
             }
+            //i("log", "()_/")
 
             var canvas: Canvas? = null
             try {
                 canvas = myThreadSurfaceHolder.lockCanvas(null)
                 canvas?.let {
+                    //i("log", "\\_()")
                     synchronized(myThreadSurfaceHolder) {
                         draw(it)
                     }
@@ -97,7 +106,7 @@ class GameDrawingThread(surfaceHolder: SurfaceHolder, context: Context) :
         }
     }
 
-    private fun draw(canvas: Canvas) {
+    fun draw(canvas: Canvas) {
         canvas.drawRGB(255, 255, 255)
         val sizeW = canvas.width / width
         val sizeH = canvas.height / height

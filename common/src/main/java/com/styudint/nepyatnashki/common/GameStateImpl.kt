@@ -5,8 +5,8 @@ import java.lang.IllegalStateException
 
 open class GameStateImpl(
     private var permutation: ArrayList<Int>,
-    private val width: Int,
-    private val height: Int
+    val width: Int,
+    val height: Int
 ) : GameState {
     init {
         if (permutation.size != width * height)
@@ -105,13 +105,13 @@ open class GameStateImpl(
     private fun positionByValue(value: Int): Pair<Int, Int> {
         for (i in 0 until width * height) {
             if (permutation[i] == value) {
-                return Pair(i / 4, i % 4)
+                return Pair(i / width, i % width)
             }
         }
         throw IllegalStateException("Cannot find empty block")
     }
 
-    private fun realValue(position: Pair<Int, Int>): Int = position.first * 4 + position.second
+    private fun realValue(position: Pair<Int, Int>): Int = position.first * width + position.second
 
     private fun isValidPosition(position: Pair<Int, Int>): Boolean {
         if (position.first !in 0 until width) return false

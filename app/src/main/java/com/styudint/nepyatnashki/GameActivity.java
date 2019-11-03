@@ -19,9 +19,10 @@ import com.styudint.nepyatnashki.account.AccountManager;
 import com.styudint.nepyatnashki.data.AndroidGameState;
 import com.styudint.nepyatnashki.data.BitmapCache;
 import com.styudint.nepyatnashki.data.GameInfo;
+import com.styudint.nepyatnashki.data.GameRequisitesHolder;
 import com.styudint.nepyatnashki.data.GameStartStateGenerator;
 import com.styudint.nepyatnashki.data.AndroidGameStateListener;
-import com.styudint.nepyatnashki.data.ImageHolder;
+import com.styudint.nepyatnashki.data.GameStartStateGeneratorImpl;
 import com.styudint.nepyatnashki.data.repositories.StatisticsRepository;
 import com.styudint.nepyatnashki.gameviews.GameView;
 import com.styudint.nepyatnashki.settings.ControlMode;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import kotlin.Pair;
 
 public class GameActivity extends AppCompatActivity implements AndroidGameStateListener, SettingsManagerListener {
     static float swipeThreshold = 120f;
@@ -58,7 +61,7 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
     BitmapCache bitmapCache;
 
     @Inject
-    ImageHolder imageHolder;
+    GameRequisitesHolder requisitesHolder;
 
     AndroidGameState currentGameState;
 
@@ -73,12 +76,13 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
 
         final AppCompatActivity thisActivity = this;
 
-        imageHolder.bitmap().observe(this, new Observer<Bitmap>() {
+        requisitesHolder.bitmap().observe(this, new Observer<Bitmap>() {
             @Override
             public void onChanged(Bitmap background) {
                 int size = Math.min(background.getWidth(), background.getHeight());
 
                 bitmapCache.initialize(background);
+                bitmapCache.setupSizes(requisitesHolder.getWidth(), requisitesHolder.getHeight());
                 bitmapCache.setupSizeBounds(0, 0, size, size);
 
 
@@ -86,6 +90,7 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
                 timerTextView = findViewById(R.id.timerTextView);
                 gameView = findViewById(R.id.gameView);
 
+                generator.changeSizes(requisitesHolder.getWidth(), requisitesHolder.getHeight());
                 generator.generate().observe(thisActivity, new Observer<AndroidGameState>() {
                     @Override
                     public void onChanged(AndroidGameState gameState) {
@@ -184,14 +189,13 @@ public class GameActivity extends AppCompatActivity implements AndroidGameStateL
     @Override
     public void onPause() {
         super.onPause();
-        gameView.pause();
         settingsManager.unsubscribe(this);
+        gameView.pause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        gameView.resume();
         settingsManager.subscribe(this);
     }
 

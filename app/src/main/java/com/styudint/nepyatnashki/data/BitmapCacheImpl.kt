@@ -15,6 +15,8 @@ class BitmapCacheImpl @Inject constructor() : BitmapCache {
     private var y2 = 0
 
     private var size = 0
+    override var width: Int = 4
+    override var height = 4
 
     private val cache = SparseArray<Bitmap>()
 
@@ -31,16 +33,21 @@ class BitmapCacheImpl @Inject constructor() : BitmapCache {
         recalcSize()
     }
 
+    override fun setupSizes(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+    }
+
     override fun getBitmapForId(id: Int): Bitmap {
         if (cache.get(id) == null) {
             if (bitmap == null)
                 throw IllegalStateException("Bitmap cannot be null")
             if (bitmap != null) {
                 val current = Bitmap.createBitmap(bitmap,
-                    (id % 4) * size / 4,
-                    (id / 4) * size / 4,
-                    size / 4,
-                    size / 4)
+                    (id % width) * size / width,
+                    (id / width) * size / width,
+                    size / width,
+                    size / width)
                 cache.put(id, current)
             }
         }

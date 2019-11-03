@@ -48,5 +48,5 @@ class MainModule(private var context: Context) {
 
     @Provides
     @Singleton
-    fun providesImageHolder(): ImageHolder = ImageHolderImpl(context)
+    fun providesGameRequisitesHolder(): GameRequisitesHolder = GameRequisitesHolderImpl(context)
 }

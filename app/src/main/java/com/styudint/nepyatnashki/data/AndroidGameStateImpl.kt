@@ -24,7 +24,7 @@ class AndroidGameStateImpl (
     private var gameTime: Long = 0
 
     override fun handleTap(value: Int) {
-        val position = Pair(value / 4, value % 4)
+        val position = Pair(value / width, value % width)
         val emptyPosition = findEmpty()
         val diff = Math.abs(position.first - emptyPosition.first) + Math.abs(position.second - emptyPosition.second)
         if (diff == 1) {
