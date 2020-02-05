@@ -14,9 +14,9 @@ import com.styudint.nepyatnashki.NePyatnashkiApp
 import com.styudint.nepyatnashki.R
 import com.styudint.nepyatnashki.data.ImageHolder
 import com.styudint.nepyatnashki.data.ResourceInfo
+import kotlinx.android.synthetic.main.basic_gallery_page_item.view.*
 import kotlinx.android.synthetic.main.gallery_image.view.*
 import kotlinx.android.synthetic.main.gallery_page_header.view.*
-import kotlinx.android.synthetic.main.basic_gallery_page_item.view.*
 import kotlinx.android.synthetic.main.horizontal_scrollable_gallery_adapter.view.*
 import javax.inject.Inject
 

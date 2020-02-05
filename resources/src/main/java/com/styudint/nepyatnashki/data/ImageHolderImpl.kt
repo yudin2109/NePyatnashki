@@ -2,14 +2,14 @@ package com.styudint.nepyatnashki.data
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.styudint.nepyatnashki.R
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import android.graphics.BitmapFactory
-import android.provider.MediaStore
-import com.styudint.nepyatnashki.R
 
 
 class ImageHolderImpl constructor(private val ctx: Context) : ImageHolder {

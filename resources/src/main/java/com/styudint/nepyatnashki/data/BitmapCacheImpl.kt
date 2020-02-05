@@ -36,7 +36,7 @@ class BitmapCacheImpl @Inject constructor() : BitmapCache {
             if (bitmap == null)
                 throw IllegalStateException("Bitmap cannot be null")
             if (bitmap != null) {
-                val current = Bitmap.createBitmap(bitmap,
+                val current = Bitmap.createBitmap(bitmap!!,
                     (id % 4) * size / 4,
                     (id / 4) * size / 4,
                     size / 4,

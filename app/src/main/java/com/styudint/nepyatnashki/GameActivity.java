@@ -1,11 +1,6 @@
 package com.styudint.nepyatnashki;
 
 import android.graphics.Bitmap;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GestureDetectorCompat;
-import androidx.lifecycle.Observer;
-
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -14,13 +9,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.lifecycle.Observer;
+
 import com.google.firebase.auth.FirebaseUser;
 import com.styudint.nepyatnashki.account.AccountManager;
 import com.styudint.nepyatnashki.data.AndroidGameState;
+import com.styudint.nepyatnashki.data.AndroidGameStateListener;
 import com.styudint.nepyatnashki.data.BitmapCache;
 import com.styudint.nepyatnashki.data.GameInfo;
 import com.styudint.nepyatnashki.data.GameStartStateGenerator;
-import com.styudint.nepyatnashki.data.AndroidGameStateListener;
 import com.styudint.nepyatnashki.data.ImageHolder;
 import com.styudint.nepyatnashki.data.repositories.StatisticsRepository;
 import com.styudint.nepyatnashki.settings.ControlMode;
