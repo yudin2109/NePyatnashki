@@ -3,6 +3,8 @@
     package="com.styudint.nepyatnashki">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:name=".NePyatnashkiApp"

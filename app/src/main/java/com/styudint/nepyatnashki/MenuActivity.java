@@ -3,17 +3,19 @@ package com.styudint.nepyatnashki;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.widget.ContentLoadingProgressBar;
-import androidx.lifecycle.Observer;
-
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.widget.ContentLoadingProgressBar;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.styudint.nepyatnashki.data.ImageHolder;
 
@@ -22,6 +24,7 @@ import javax.inject.Inject;
 public class MenuActivity extends AppCompatActivity {
 
     static int OPEN_IMAGE = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 2;
 
     @Inject
     ImageHolder imageHolder;
@@ -76,8 +79,12 @@ public class MenuActivity extends AppCompatActivity {
                 imageHolder.loadImage(uri);
             }
         }
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            ((MutableLiveData<Bitmap>)imageHolder.bitmap()).setValue(imageBitmap);
+        }
     }
-
 
     public void startGameActivity(View view) {
         Intent intent = new Intent(this, GalleryPage.class);
@@ -91,5 +98,16 @@ public class MenuActivity extends AppCompatActivity {
 
     public void onSettingsClicked(View view) {
         startActivity(new Intent(this, SettingsPage.class));
+    }
+
+    public void onPhotoButtonClick(View view) {
+        takePictureIntent();
+    }
+
+    private void takePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
     }
 }
